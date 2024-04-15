@@ -1,20 +1,20 @@
 <template>
-    <el-menu default-active="1-4-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-        :collapse="isCollapse" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
-        <h3>{{ isCollapse ? '运动会' : '学生田径运动会报名系统' }}</h3>
-        <el-menu-item @click="clickMenu(item)" v-for="item in noChildren" :key="item.name" :index="item.name">
+    <el-menu :default-active="activeIndex" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+        :collapse="isCollapse" background-color="#545c64" text-color="#fff" activeIndex="activeIndex"
+        active-text-color="#ffd04b">
+        <h3>{{ isCollapse ? '委托' : '校园委托平台' }}</h3>
+        <el-menu-item @click="clickMenu(item)" v-for="item in noChildren" :key="item.name" :index="item.index">
             <i :class="`el-icon-${item.icon}`"></i>
             <span slot="title">{{ item.label }}</span>
         </el-menu-item>
-        <el-submenu v-for="item in hasChildren" :key="item.label" index="item.label">
+        <el-submenu v-for="item in hasChildren" :key="item.label" :index="item.index">
             <template slot="title">
                 <i :class="`el-icon-${item.icon}`"></i>
                 <span slot="title">{{ item.label }}</span>
             </template>
-            <el-menu-item-group v-for="subItem in item.children" :key="subItem.path">
-                <el-menu-item @click="clickMenu(subItem)" :index="subItem.path">{{ subItem.label }}</el-menu-item>
+            <el-menu-item-group v-for="subItem in item.children" :key="subItem.index">
+                <el-menu-item @click="clickMenu(subItem)" :index="subItem.index">{{ subItem.label }}</el-menu-item>
             </el-menu-item-group>
-
         </el-submenu>
 
 
@@ -22,11 +22,11 @@
 </template>
 
 
-  
+
 <style lang="less" scoped>
 .el-menu-vertical-demo:not(.el-menu--collapse) {
     width: 200px;
-    height: 754px;
+    height: 792px;
 }
 
 .el-menu {
@@ -42,83 +42,96 @@
     }
 }
 </style>
-  
+
 <script>
+
+
+
 export default {
     watch: {
         '$route'(to, from) {
             // 在路由变化时触发，你可以在这里更新面包屑的样式
             // 比如根据当前路由信息 to 来设置面包屑样式
             console.log("to ", to)
+            this.updateMenuState(to.path);
         }
     },
     data() {
         return {
-
+            isUniqueOpened: true,
+            activeIndex: '0',
+            //菜单
             menuData: [
                 {
                     path: '/home',
                     name: 'home',
                     label: '首页',
                     icon: 's-home',
-                    url: 'Home/Home'
+                    url: 'Home/Home',
+                    index: '1'
                 },
                 {
-                    path: '/user',
+                    path: '/CreateDelegation',
                     name: 'user',
-                    label: '用户管理',
+                    label: '发布委托',
                     icon: 'user',
-                    url: 'user/user'
+                    url: 'user/CreateDelegation',
+                    index: '2'
                 },
                 {
                     path: '/event',
                     name: 'event',
-                    label: '运动会管理',
+                    label: '浏览委托',
                     icon: 's-custom',
-                    url: 'eventMange/eventMange'
+                    url: 'eventMange/eventMange',
+                    index: '3'
                 },
                 {
                     path: '/athlete',
                     name: 'athlete',
-                    label: '运动员参赛管理',
+                    label: '我的委托',
                     icon: 's-custom',
-                    url: 'athleteMange/athleteMange'
+                    url: 'athleteMange/athleteMange',
+                    index: '4'
                 },
                 {
-                    path: '/eventItem',
-                    name: 'eventItem',
-                    label: '项目管理',
+                    path: '/myInfo',
+                    name: 'myInfo',
+                    label: '个人信息',
                     icon: 's-custom',
-                    url: 'eventItemMange/eventItemMange'
+                    url: 'eventItemMange/eventItemMange',
+                    index: '5'
                 },
                 {
                     path: '/athleteApplication',
                     name: 'athleteApplication',
-                    label: '运动员申请',
+                    label: '帮助与支持',
                     icon: 's-custom',
-                    url: 'athleteApplication/athleteApplication'
-                },
-                {
-                    label: '其他',
-                    icon: 'location',
-                    children: [
-                        {
-                            path: '/page1',
-                            name: 'page1',
-                            label: '页面1',
-                            icon: 'setting',
-                            url: 'Other/PageOne'
-                        },
-                        {
-                            path: '/page2',
-                            name: 'page2',
-                            label: '页面2',
-                            icon: 'setting',
-                            url: 'Other/PageTwo'
-                        },
-                    ]
-
+                    url: 'athleteApplication/athleteApplication',
+                    index: '6'
                 }
+                // ,
+                // {
+                //     label: '其他',
+                //     icon: 'location',
+                //     children: [
+                //         {
+                //             path: '/page1',
+                //             name: 'page1',
+                //             label: '页面1',
+                //             icon: 'setting',
+                //             url: 'Other/PageOne'
+                //         },
+                //         {
+                //             path: '/page2',
+                //             name: 'page2',
+                //             label: '页面2',
+                //             icon: 'setting',
+                //             url: 'Other/PageTwo'
+                //         },
+                //     ]
+
+                // }
             ]
 
         };
@@ -144,129 +157,204 @@ export default {
         refreshPage() {
             this.$router.go(0);
         },
+        setUserInfo() {
+            const userInfo = localStorage.getItem('TaskUser')
+            // console.log("userInfo", userInfo)
+            this.$store.commit('loginUser', JSON.parse(userInfo))
+        },
+        extractPathsAndIndices() {
+            const result = [];
+
+            this.menuData.forEach((item) => {
+                if (!item.children) {
+                    result.push({ path: item.path, index: item.index });
+                } else {
+                    item.children.forEach((child) => {
+                        result.push({ path: child.path, index: child.index });
+                    });
+                }
+
+            });
+
+            return result;
+        },
         userPermissions(type) {
-            if (type === '工作人员') {
+            if (type === 'admin') {
                 this.menuData = [
                     {
                         path: '/home',
                         name: 'home',
                         label: '首页',
                         icon: 's-home',
-                        url: 'Home/Home'
+                        url: 'Home/Home',
+                        index: '0'
                     },
                     {
-                        path: '/user',
-                        name: 'user',
+                        path: '/userList',
+                        name: 'userList',
                         label: '用户管理',
+                        icon: 's-home',
+                        url: '/userList',
+                        index: '1',
+                    },
+                    {
+                        label: '委托管理',
+                        icon: 'location',
+                        index: '2',
+                        children: [
+                            {
+                                path: '/draftList',
+                                name: 'draftList',
+                                label: '草稿',
+                                icon: 'setting',
+                                url: 'delegation/draftList',
+                                index: '2-1'
+                            },
+                            {
+                                path: '/auditList',
+                                name: 'auditList',
+                                label: '审核',
+                                icon: 'setting',
+                                url: 'delegation/auditList',
+                                index: '2-2'
+                            },
+                            {
+                                path: '/publishedList',
+                                name: 'publishedList',
+                                label: '已发布',
+                                icon: 'setting',
+                                url: 'delegation/publishedList',
+                                index: '2-3'
+                            },
+                            {
+                                path: '/delegationUpdateRecords',
+                                name: 'delegationUpdateRecords',
+                                label: '委托更新记录',
+                                icon: 'setting',
+                                url: 'delegation/DelegationUpdateRecords',
+                                index: '2-4'
+                            },
+                        ]
+                    },
+                    {
+                        label: '系统管理',
                         icon: 'user',
-                        url: 'user/user'
+                        index: '3',
+                        children: [
+                            {
+                                path: '/systemBulletinList',
+                                name: 'systemBulletinList',
+                                label: '系统公告',
+                                icon: 'setting',
+                                url: 'sys/systemBulletinList',
+                                index: '3-1'
+                            },
+                            {
+                                path: '/systemNoticeList',
+                                name: 'systemNoticeList',
+                                label: '系统通知',
+                                icon: 'setting',
+                                url: 'sys/systemNoticeList',
+                                index: '3-2'
+                            },
+                        ]
                     },
                     {
-                        path: '/event',
-                        name: 'event',
-                        label: '运动会管理',
+                        label: '校园委托相关设置',
                         icon: 's-custom',
-                        url: 'eventMange/eventMange'
-                    },
-                    {
-                        path: '/athlete',
-                        name: 'athlete',
-                        label: '运动员参赛管理',
-                        icon: 's-custom',
-                        url: 'athleteMange/athleteMange'
-                    },
-                    {
-                        path: '/eventItem',
-                        name: 'eventItem',
-                        label: '项目管理',
-                        icon: 's-custom',
-                        url: 'eventItemMange/eventItemMange'
+                        index: '4',
+                        children: [
+                            {
+                                path: '/delegationType',
+                                name: 'delegationType',
+                                label: '委托类别',
+                                icon: 'setting',
+                                url: 'setting/delegationType',
+                                index: '4-1'
+                            },
+                            {
+                                path: '/systemNoticeList',
+                                name: 'systemNoticeList',
+                                label: '系统通知',
+                                icon: 'setting',
+                                url: 'setting/systemNoticeList',
+                                index: '4-2'
+                            },
+                        ]
                     },
                     {
                         label: '其他',
                         icon: 'location',
+                        index: '5',
                         children: [
                             {
                                 path: '/page1',
                                 name: 'page1',
                                 label: '页面1',
                                 icon: 'setting',
-                                url: 'Other/PageOne'
+                                url: 'Other/PageOne',
+                                index: '5-1'
                             },
                             {
                                 path: '/page2',
                                 name: 'page2',
                                 label: '页面2',
                                 icon: 'setting',
-                                url: 'Other/PageTwo'
+                                url: 'Other/PageTwo',
+                                index: '5-2'
                             },
                             {
                                 path: '/page3',
                                 name: 'page3',
                                 label: '页面3',
                                 icon: 'setting',
-                                url: 'Other/PageThree'
+                                url: 'Other/PageThree',
+                                index: '5-3'
                             },
                         ]
 
                     }
                 ]
-            } else if (type === '学生') {
-                this.menuData = [
-                    {
-                        path: '/home',
-                        name: 'home',
-                        label: '首页',
-                        icon: 's-home',
-                        url: 'Home/Home'
-                    },
-                    {
-                        path: '/athleteApplication',
-                        name: 'athleteApplication',
-                        label: '运动员申请',
-                        icon: 's-custom',
-                        url: 'athleteApplication/athleteApplication'
-                    }
-
-
-                ]
-            } else {
-                this.menuData = [
-                    {
-                        path: '/home',
-                        name: 'home',
-                        label: '首页',
-                        icon: 's-home',
-                        url: 'Home/Home'
-                    },
-                    {
-                        path: '/eventItem',
-                        name: 'eventItem',
-                        label: '项目参看和报名',
-                        icon: 's-custom',
-                        url: 'eventItemMange/eventItemMange'
-                    },
-                    {
-                        path: '/athlete',
-                        name: 'athlete',
-                        label: '我的参赛管理',
-                        icon: 's-custom',
-                        url: 'athleteMange/athleteMange'
-                    },
-                    {
-                        path: '/myInfo',
-                        name: 'myInfo',
-                        label: '我的个人信息',
-                        icon: 's-custom',
-                        url: 'myInfo/myInfo'
-                    }
-
-                ]
             }
+        },
+        initAside() {
+            const currentPath = this.$route.path;
+            this.menuData.forEach((item) => {
+                if (!item.children) {
+                    if (item.path === currentPath) {
+                        this.$store.commit('selectMenu', item)
+                        this.activeIndex = item.index;
+                    }
+                } else {
+                    item.children.forEach((child) => {
+                        if (child.path === currentPath) {
+                            this.$store.commit('selectMenu', child)
+                            this.activeIndex = child.index;
+                        }
+                    });
+                }
+
+            });
+        },
+        updateMenuState(path) {
+            const currentPath = path; // 或者使用其他属性如 `$route.params` 根据实际情况
+            const activeItem = this.extractPathsAndIndices().find(item => item.path === currentPath);
+            console.log(activeItem);
+            if (activeItem) {
+                this.activeIndex = activeItem.index;
+            } else {
+
+                this.activeIndex = 0; // 或默认值
+            }
+
+
         }
     },
     mounted() {
-        this.userPermissions(this.$store.state.userInfo.type)
+
+        this.setUserInfo()
+        this.userPermissions(this.$store.state.userInfo.userType)
+        this.initAside()
     },
     computed: {
         //没有子菜单
@@ -282,6 +370,7 @@ export default {
 
     }
 }
+
 </script>
 <style lang="less" scoped>
 .el-menu {

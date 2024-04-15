@@ -2,8 +2,81 @@ import http from '../utils/request'
 
 // import aliyun from '../utils/ailiyun.js'
 
-export const getData = () => {
-    return http.get('/event/mainPageData')
+export const getData = (id) => {
+    return http.get('task/getNewTask/' + id)
+}
+
+export const userList = (data) => {
+    return http.post('user/page', data)
+}
+
+export const getTaskCategories = (id) => {
+    console.log("获取委托的分类类别");
+    return http.get('/task/getTaskCategory')
+}
+
+export const addTaskDraft = (data) => {
+    console.log("添加用户草稿")
+    return http.post('/task/addTaskDraft', data)
+}
+
+export const getTaskDraftById = (id) => {
+    console.log("用户获取委托草稿");
+    return http.get('/task/getUserDelegateDraft/' + id)
+}
+
+export const getDraftDetailsBasedOnCommissionId = (id) => {
+    console.log("根据委托id获取委托草稿详情");
+    return http.get('/task/getTask/' + id)
+}
+
+export const updateTaskDraft = (data) => {
+    console.log("更新委托草稿");
+    return http.post('/task/updateTaskDraft', data)
+}
+
+export const deleteTaskDraft = (id) => {
+    console.log("删除委托草稿");
+    return http.delete('/task/deleteTaskDraft/' + id)
+}
+
+export const submitTaskDraft = (id) => {
+    console.log("提交委托草稿");
+    return http.put('/task/auditTask/' + id)
+}
+
+export const confirmTask = (id) => {
+    console.log("确认发布委托");
+    return http.put('/task/confirmTask/' + id)
+}
+
+
+export const getReason = (id) => {
+    console.log("获取审核不通过的原因");
+    return http.get('/task/getReason/' + id)
+}
+
+export const getUserInfo = (id) => {
+    console.log("获取用户信息");
+    return http.get('/userInfo/' + id)
+}
+
+export const uploadImg = (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return http.post('/img/upload', formData)
+}
+
+export const submitCertificationInformation = (data) => {
+    console.log("提交认证信息");
+    return http.post('/userInfo', data)
+}
+
+export const getUserList = (listSelectCondition) => {
+    console.log("查询参数", listSelectCondition);
+    return http.get('/users/page', {
+        params: listSelectCondition,
+    })
 }
 
 export const uploadAvatar = (file) => {
@@ -62,10 +135,6 @@ export const logout = () => {
     return http.delete('user/logout')
 }
 
-export const checkLogin = () => {
-    console.log("检查jwt")
-    return http.get('user/checkLogin')
-}
 
 export const register = (userInfo) => {
     console.log("注册参数", userInfo)
@@ -77,12 +146,7 @@ export const deleteUser = (id) => {
     return http.delete('/user/' + id)
 }
 
-export const userList = (listSelectCondition) => {
-    console.log("查询参数", listSelectCondition);
-    return http.get('/user/page', {
-        params: listSelectCondition,
-    })
-}
+
 
 export const athleteAdd = (athlete) => {
     console.log("athleteAdd参数", athlete);

@@ -2,12 +2,12 @@
   <div class="header-container">
     <div class="l-content">
       <el-button @click="handleMenu" style="margin-right: 10px;" icon="el-icon-menu" size="medium"></el-button>
-      <!-- 面包雪 -->
+      <!-- 面包屑 -->
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item v-for="item in tags" :key="item.path" :to="{ path: item.path }" :id="generateUniqueId(item)"
+        <!-- <el-breadcrumb-item v-for="item in tags" :key="item.path" :to="{ path: item.path }" :id="generateUniqueId(item)"
           :class="generateItemClass(item)">
           {{ item.label }}
-        </el-breadcrumb-item>
+        </el-breadcrumb-item> -->
 
       </el-breadcrumb>
 
@@ -29,9 +29,10 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      
 
-      <el-dialog title="修改头像" :visible.sync="dialogAvatarVisible" @close="handleDialogClose" :width="dialogWidth"  class="my-dialog">
+
+      <el-dialog title="修改头像" :visible.sync="dialogAvatarVisible" @close="handleDialogClose" :width="dialogWidth"
+        class="my-dialog">
         <avatarShowVue :initialSrc="avatarSrc" />
       </el-dialog>
     </div>
@@ -47,13 +48,13 @@ import { logout } from '@/api';
 export default {
   components: {
     avatarShowVue
-    },
+  },
   data() {
     return {
       dialogAvatarVisible: false,
       imageUrl: '',
       initialImageSrc: '',
-      avatarSrc:'',
+      avatarSrc: '',
       dialogWidth: '800px',
 
     }
@@ -68,13 +69,13 @@ export default {
     showTooltip: function (newVal, oldVal) {
       // 在这里处理 showTooltip 值的变化
       console.log("newVal", newVal),
-      console.log("old", oldVal)
+        console.log("old", oldVal)
     }
   },
   methods: {
-    handleDialogClose(){
+    handleDialogClose() {
       console.log("userInfo.avatarSrc", this.$store.state.userInfo)
-      this.avatarSrc=this.$store.state.userInfo.avatarSrc;
+      this.avatarSrc = this.$store.state.userInfo.avatarSrc;
       console.log("this.avatarSrc", this.avatarSrc)
     },
 
@@ -139,15 +140,15 @@ export default {
   computed: {
     // ...mapState 意味着将 mapState 返回的所有属性都添加到 computed 对象中。
     //创建一个名为 tags 的计算属性，它将获取 Vuex 的状态中 state.tab.tabsList 的数据。
-    ...mapState({
-      tags: state => state.tab.tabsList
-    })
+    // ...mapState({
+    //   tags: state => state.tab.tabsList
+    // })
   },
   mounted() {
-    console.log(this.tags, 'tags')
-    const sportsUser = localStorage.getItem('sportsUser')
-    const parsedUser = JSON.parse(sportsUser);
-    this.avatarSrc = parsedUser.avatarSrc;
+    // console.log(this.tags, 'tags')
+    const TaskUser = localStorage.getItem('TaskUser')
+    const parsedUser = JSON.parse(TaskUser);
+    // this.avatarSrc = parsedUser.avatarSrc;
   }
 
 }
@@ -250,7 +251,8 @@ export default {
 
 .my-dialog {
   // max-height: 50vh; /* 设置最大高度为视口高度的80% */
-  min-height: 500px; /* 设置最小高度为200px */
+  min-height: 500px;
+  /* 设置最小高度为200px */
   // overflow-y: auto; /* 当内容超出最大高度时显示滚动条 */
 }
 </style>

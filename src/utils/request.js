@@ -29,7 +29,6 @@ http.interceptors.response.use(function (response) {
   // 对响应数据做点什么
 
   if (response.data.message === '令牌校验失败') {
-    ;
     console.log("删除JWT令牌", response)
     // 删除JWT令牌
     localStorage.removeItem('jwtToken');
@@ -37,10 +36,12 @@ http.interceptors.response.use(function (response) {
   }
   return response;
 }, function (error) {
-  // 超出 2xx 范围的状态码都会触发该函数。
-  console.log("网址", window.location.href)
-  // 对响应错误做点什么
-  // window.location.href = '/login'; 
+  // 对响应错误做全局处理
+
+  // 判断是否为HTTP请求错误
+
+
+
   return Promise.reject(error);
 });
 

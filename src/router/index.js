@@ -13,6 +13,15 @@ import EventItem from '../views/EventItem.vue'
 import AthleteApplication from '../views/AthleteApplication.vue'
 import User from '../views/User.vue'
 import myInfo from '../views/myInfo.vue'
+import CreateDelegation from '@/views/CreateDelegation.vue'
+import UserList from '@/views/admin/UserList.vue'
+import DraftList from '@/views/admin/DraftList.vue'
+import AuditList from '@/views/admin/AuditList.vue'
+import PublishedList from '@/views/admin/PublishedList.vue'
+import DelegationUpdateRecords from '@/views/admin/DelegationUpdateRecords.vue'
+import SystemBulletinList from '@/views/admin/SystemBulletinList.vue'
+import SystemNoticeList from '@/views/admin/SystemNoticeList.vue'
+import DelegationType from '@/views/admin/DelegationType.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -34,7 +43,7 @@ const routes = [
                 }
             },
             { path: '/home', name: 'home', component: Home },
-            { path: '/event', name: 'event', component: Event },
+            { path: '/CreateDelegation', name: 'event', component: CreateDelegation },
             { path: '/user', name: 'user', component: User },
             { path: '/athlete', name: 'athlete', component: Athlete },
             { path: '/eventItem', name: 'eventItem', component: EventItem },
@@ -43,6 +52,14 @@ const routes = [
             { path: '/page1', name: 'page1', component: pageOne },
             { path: '/page2', name: 'page2', component: pageTwo },
             { path: '/page3', name: 'page3', component: pageThree },
+            { path: '/userList', name: 'userList', component: UserList },
+            { path: '/draftList', name: 'draftList', component: DraftList },
+            { path: '/auditList', name: 'auditList', component: AuditList },
+            { path: '/publishedList', name: 'publishedList', component: PublishedList },
+            { path: '/delegationUpdateRecords', name: 'delegationUpdateRecords', component: DelegationUpdateRecords },
+            { path: '/systemBulletinList', name: 'systemBulletinList', component: SystemBulletinList },
+            { path: '/systemNoticeList', name: 'systemNoticeList', component: SystemNoticeList },
+            { path: '/delegationType', name: 'delegationType', component: DelegationType },
         ]
     },
     // 默认页面

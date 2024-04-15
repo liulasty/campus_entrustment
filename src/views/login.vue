@@ -12,36 +12,37 @@
         </div>
         <div class="container panel-active">
             <!-- 注册 -->
-            <div class="formBox register">
+            <div class="formBox  login">
                 <form action="#" class="form" id="form1">
-                    <h2 class="title">注 册</h2>
-                    <input type="text" placeholder="用户名(4到8个字母、数字或下划线)" class="input" v-model="registerInfo.username" />
-                    <input type="password" placeholder="密码" class="input" v-model="registerInfo.password" />
-                    <input type="email" placeholder="邮箱" class="input" v-model="registerInfo.email" />
-                    <input type="text" placeholder="电话号码" class="input" v-model="registerInfo.phoneNumber" />
-                    <button class="btn" @click.prevent="registerCheck">注册</button>
+                    <h2 class="title">登 陆</h2>
+                    <input type="text" placeholder="用户名" class="input" v-model="loginInfo.username" />
+                    <input type="password" placeholder="密码" class="input" v-model="loginInfo.password" />
+                    <a href="#" class="link">忘记密码？</a>
+                    <button class="btn" @click.prevent="loginCheck">登陆</button>
                 </form>
             </div>
 
             <!-- 登录 -->
-            <div class="formBox login">
+            <div class="formBox register">
                 <form action="#" class="form" id="form2">
-                    <h2 class="title">登 陆</h2>
-                    <input type="text" placeholder="邮箱" class="input" />
-                    <input type="password" placeholder="密码" class="input" />
-                    <!-- <a href="#" class="link">忘记密码？</a> -->
-                    <button class="btn" @click.prevent="loginCheck">登陆</button>
+                    <h2 class="title">注 册</h2>
+                    <input type="text" placeholder="用户名(4到8个字母、数字或下划线)" class="input" v-model="registerInfo.username" />
+                    <input type="password" placeholder="密码" class="input" v-model="registerInfo.password" />
+                    <input type="email" placeholder="邮箱" class="input" v-model="registerInfo.email" />
+                    <!-- <input type="text" placeholder="电话号码" class="input" v-model="registerInfo.phoneNumber" /> -->
+                    <button class="btn" @click.prevent="registerCheck">注册</button>
                 </form>
+
             </div>
 
             <!-- 浮层 -->
             <div class="overlay-box">
                 <div class="overlay">
                     <div class="panel over-left">
-                        <button class="btn" id="signIn">已有账号？立即登陆</button>
+                        <button class="btn" id="signIn">无账号？前往注册</button>
                     </div>
                     <div class="panel over-right">
-                        <button class="btn" id="signUp">无账号？前往注册</button>
+                        <button class="btn" id="signUp">已有账号？立即登陆</button>
                     </div>
                 </div>
             </div>
@@ -115,56 +116,50 @@ export default {
         //登录
         loginCheck() {
             console.log("登录")
-
-            const form = document.getElementById("form2");
-            const username = form.elements[0].value;
-            const password = form.elements[1].value;
-            if (this.validateStr(username, "u") !== "username") {
+            // this.loginInfo = {
+            //     username: 'majiaqi',
+            //     password: '2312034544lz'
+            // }
+            const msg = this.validate(this.loginInfo, this.rules)
+            if (msg.validate === false) {
                 this.$message({
                     showClose: true,
-                    message: '用户名格式错误请重新输入',
+                    message: msg.errorMsg,
                     type: 'error'
                 });
-
                 return;
             } else {
-                if (this.validateStr(password, "p") == "password") {
-                    this.loginInfo.username = username
-                    this.loginInfo.password = password
+                login(this.loginInfo).then((data) => {
+                    console.log("登录后的参数", data.data);
+                    if (data.data.code === 1) {
+                        // 存储JWT令牌
+                        localStorage.setItem('jwtToken', data.data.data.token);
+                        localStorage.setItem('TaskUser', JSON.stringify(data.data.data));
 
-                    login(this.loginInfo).then((data) => {
-                        console.log("登录后的参数", data.data);
-                        if (data.data.code === 1) {
-                            // 存储JWT令牌
-                            localStorage.setItem('jwtToken', data.data.data.token);
-                            localStorage.setItem('sportsUser', JSON.stringify(data.data.data));
+                        this.$store.commit('loginUser', data.data.data);
 
-                            this.$store.commit('loginUser', data.data.data);
+                        this.$router.push('/main')
 
-                            this.$router.push('/main')
-
-                            this.$message({
-                                showClose: true,
-                                message: '恭喜你，登录成功成功',
-                                type: 'success'
-                            })
-                        } else {
-                            this.$message({
-                                showClose: true,
-                                message: data.data.msg,
-                                type: 'error'
-                            });
-                        }
-                    });
-                } else {
+                        this.$message({
+                            showClose: true,
+                            message: '恭喜你，登录成功成功',
+                            type: 'success'
+                        })
+                    } else {
+                        this.$message({
+                            showClose: true,
+                            message: data.data.msg,
+                            type: 'error'
+                        });
+                    }
+                }).catch(err => {
                     this.$message({
                         showClose: true,
-                        message: '密码错误请重新输入',
+                        message: '服务器错误,检查网络连接',
                         type: 'error'
                     });
+                });
 
-
-                }
             }
         },
 
@@ -228,6 +223,7 @@ export default {
         },
         // 执行校验
         validate(registerInfo, rules) {
+            console.log("校验内容", registerInfo);
             let msg = null;
             for (const key in registerInfo) {
                 const value = registerInfo[key];
@@ -243,8 +239,8 @@ export default {
             }
             console.log("校验结果：", msg);
             return {
-                validate: msg.validate,
-                errorMsg: msg.errorMsg
+                validate: this.isValid,
+                errorMsg: this.errorMsg
             };
 
         },
@@ -270,17 +266,17 @@ export default {
                     if (data.data.code === 1) {
                         this.$message({
                             showClose: true,
-                            message: '恭喜你，注册成功成功',
+                            message: data.data.msg,
                             type: 'success'
                         })
-                        this.$router.push('/main')
+
                     } else {
                         this.$message({
                             showClose: true,
                             message: data.data.msg,
                             type: 'error'
                         });
-                        this.$router.push('/main')
+
                     }
                 });
             } else {

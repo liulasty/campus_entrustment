@@ -16,9 +16,9 @@
 
     </div>
 </template>
-  
+
 <script>
-import { deleteImg } from '@/api'
+import { deleteImg, uploadImg } from '@/api'
 
 export default {
 
@@ -69,8 +69,8 @@ export default {
             }
             this.imageUrls.splice(index, 1);
         },
-        uploadImages() {
-            this.deleteImage();
+        async uploadImages() {
+            // this.deleteImage();
             for (let i = 0; i < this.imageUrls.length; i++) {
                 const image = this.imageUrls[i];
 
@@ -78,23 +78,17 @@ export default {
                     continue;
                 }
 
-                const formData = new FormData();
-                formData.append('file', this.dataURLtoFile(image.url, `image${i}.png`));
 
 
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'http://localhost:80/sports/img/upload', false); // 设置请求为同步
-                xhr.send(formData);
+                await uploadImg(this.dataURLtoFile(image.url, `image${i}.png`)).then(data => {
+                    // console.log(data);
+                    this.imageUrls[i].ossUrl = data.data.data;
 
-                if (xhr.status === 200) {
-                    console.log('文件上传成功！', xhr.response);
-                    image.ossUrl = xhr.responseText
-                } else {
-                    console.error('文件上传失败！错误码：' + xhr.status);
-                }
+                    // console.log("上传的阿里云图片", this.imageUrls[i])
+                })
 
-                this.imageUrls[i].ossUrl = image.ossUrl
-                console.log("修改的阿里云图片", this.imageUrls[i])
+
+
             }
 
         },
@@ -140,42 +134,12 @@ export default {
                     })
             });
         },
-        //发送总共的集合
-        sendImgCollection() {
-            const collection = [];
-
-            for (let index = 0; index < this.imageUrls.length; index++) {
-                const image = this.imageUrls[index].oss_url;
-                collection.push(image)
-            }
-
-            fetch('http://localhost:80/imageList', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(collection),
-            })
-                .then(response => {
-                    if (response.ok) {
-                        // 请求成功，可以在这里处理成功的逻辑
-                        console.log('集合发送成功');
-                    } else {
-                        // 请求失败，可以在这里处理失败的逻辑
-                        console.log('集合发送失败');
-                    }
-                })
-                .catch(error => {
-                    // 请求过程中发生错误，可以在这里处理错误
-                    console.log('请求发生错误:', error);
-                });
-        },
         //测试组件间通信
         testImg() {
             console.log('testIMg')
         },
-        
-        initImgSet(){
+
+        initImgSet() {
             console.log("清理图片集合")
             //图片的集合
             this.imageUrls = []
@@ -235,5 +199,3 @@ export default {
     /* 鼠标悬停时显示按钮 */
 }
 </style>
-  
-  

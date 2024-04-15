@@ -1,37 +1,40 @@
-export default{
-    state:{
-        username:"",
-        userId:0,
-        avatarSrc:"",
-        type:"",
-        token:"",
+export default {
+    state: {
+        userName: "",
+        userId: 0,
+        avatarSrc: "",
+        userType: "",
+        token: "",
     },
-    mutations:{
-        removeUser(state){
-            state.username="";
-            state.userId="";
-            state.password="";
-            state.token=""
+    mutations: {
+        removeUser(state) {
+            state.username = "";
+            state.userId = "";
+            state.password = "";
+            state.token = ""
         },
-        loginUser(state,data){
-            console.log("loginUser",data)
-            state.username=data.userName;
-            state.userId=data.id;
-            state.avatarSrc=data.avatarSrc;
-            state.type=data.type
+        loginUser(state, data) {
+            console.log("loginUser", data)
+            state.userName = data.userName;
+            state.userId = data.userId;
+            // state.avatarSrc = data.avatarSrc;
+            state.userType = data.userType
         },
-        removeToken(state){
-            state.token=""
+        getUserId(state) {
+            return state.id
         },
-        setToken(state,token){
-            console.log("设置token",token)
-            state.token=token
+        removeToken(state) {
+            state.token = ""
         },
-        updatedAvatarSrc(state,data) {
-            state.avatarSrc=data
-            localStorage.setItem("avatarSrc",data)
-            
-            
+        setToken(state, token) {
+            console.log("设置token", token)
+            state.token = token
+        },
+        updatedAvatarSrc(state, data) {
+            state.avatarSrc = data
+            localStorage.setItem("avatarSrc", data)
+
+
         },
     }
 }

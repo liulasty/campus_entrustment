@@ -26,22 +26,28 @@ export default {
     },
     methods: {
         ToLogin() {
-            checkLogin().then((data) => {
-                console.log("检查登录", data)
-                if (data.data.code == 1) {
-                    if (data.data.message == '令牌校验失败') {
+            this.$router.push('/login')
+            // const token = localStorage.getItem('jwtToken');
+            // console.log("token", token)
+            // if (typeof token === 'undefined') {
+            //     this.$router.push('/login')
+            // } else {
+            //     console.log("token", token)
+            // }
 
-                        this.$router.push('/login')
-                    } else {
+            // console.log("检查登录", data)
 
-                        this.$router.push('/main')
-                    }
+            // if (jwt == 1) {
+            //     if (data.data.message == '令牌校验失败') {
 
-                }
-            }).catch((err) => {
-                console.log(err)
-                this.$router.push('/login')
-            })
+            //         this.$router.push('/login')
+            //     } else {
+
+            //         this.$router.push('/main')
+            //     }
+
+            // }
+
 
 
         },
