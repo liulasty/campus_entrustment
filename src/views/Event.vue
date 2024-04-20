@@ -219,13 +219,21 @@ export default {
     },
     methods: {
         handleClose(done) {
+            // 显示确认关闭的对话框
             this.$confirm('确认关闭？')
-                .then(_ => {
-                    done();
-
+                .then(() => {
+                    // 在调用done之前检查它是否存在并且是一个函数
+                    if (typeof done === 'function') {
+                        done();
+                    }
                 })
-                .catch(_ => { });
+                .catch(error => {
+                    // 记录关闭操作中发生的错误
+                    // 以下行提供了错误信息的示例记录方式，实际应用中可以根据需要调整
+                    console.error('关闭操作中发生错误:', error);
+                });
         },
+
         handleSizeChange(val) {
             console.log(`每页 ${val} 条`);
             this.eventList.pageSize = val;

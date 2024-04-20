@@ -71,25 +71,23 @@ export default {
         },
         async uploadImages() {
             // this.deleteImage();
+
             for (let i = 0; i < this.imageUrls.length; i++) {
                 const image = this.imageUrls[i];
 
                 if (image.type === 'old') {
                     continue;
                 }
-
-
-
                 await uploadImg(this.dataURLtoFile(image.url, `image${i}.png`)).then(data => {
-                    // console.log(data);
+                    console.log("上传的阿里云图片", data.data.data)
                     this.imageUrls[i].ossUrl = data.data.data;
 
-                    // console.log("上传的阿里云图片", this.imageUrls[i])
                 })
 
 
 
             }
+
 
         },
         deleteImage() {

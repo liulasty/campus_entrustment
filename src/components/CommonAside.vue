@@ -16,8 +16,6 @@
                 <el-menu-item @click="clickMenu(subItem)" :index="subItem.index">{{ subItem.label }}</el-menu-item>
             </el-menu-item-group>
         </el-submenu>
-
-
     </el-menu>
 </template>
 
@@ -59,7 +57,7 @@ export default {
     data() {
         return {
             isUniqueOpened: true,
-            activeIndex: '0',
+            activeIndex: '1',
             //菜单
             menuData: [
                 {
@@ -146,7 +144,7 @@ export default {
         clickMenu(item) {
             console.log("点击菜单", item)
 
-            if (this.$route.path !== item.path && !(this.$route.path == '/home' && (item.path === '/'))) {
+            if (this.$route.path !== item.path) {
                 this.$router.push(item.path)
             } else {
                 // this.refreshPage()
@@ -187,7 +185,7 @@ export default {
                         label: '首页',
                         icon: 's-home',
                         url: 'Home/Home',
-                        index: '0'
+                        index: '1'
                     },
                     {
                         path: '/userList',
@@ -195,12 +193,11 @@ export default {
                         label: '用户管理',
                         icon: 's-home',
                         url: '/userList',
-                        index: '1',
+                        index: '2',
                     },
                     {
                         label: '委托管理',
-                        icon: 'location',
-                        index: '2',
+                        icon: 'location', index: '3',
                         children: [
                             {
                                 path: '/draftList',
@@ -208,7 +205,7 @@ export default {
                                 label: '草稿',
                                 icon: 'setting',
                                 url: 'delegation/draftList',
-                                index: '2-1'
+                                index: '3-1'
                             },
                             {
                                 path: '/auditList',
@@ -216,7 +213,7 @@ export default {
                                 label: '审核',
                                 icon: 'setting',
                                 url: 'delegation/auditList',
-                                index: '2-2'
+                                index: '3-2'
                             },
                             {
                                 path: '/publishedList',
@@ -224,7 +221,7 @@ export default {
                                 label: '已发布',
                                 icon: 'setting',
                                 url: 'delegation/publishedList',
-                                index: '2-3'
+                                index: '3-3'
                             },
                             {
                                 path: '/delegationUpdateRecords',
@@ -232,14 +229,13 @@ export default {
                                 label: '委托更新记录',
                                 icon: 'setting',
                                 url: 'delegation/DelegationUpdateRecords',
-                                index: '2-4'
+                                index: '3-4'
                             },
                         ]
                     },
                     {
                         label: '系统管理',
-                        icon: 'user',
-                        index: '3',
+                        icon: 'user', index: '4',
                         children: [
                             {
                                 path: '/systemBulletinList',
@@ -247,29 +243,6 @@ export default {
                                 label: '系统公告',
                                 icon: 'setting',
                                 url: 'sys/systemBulletinList',
-                                index: '3-1'
-                            },
-                            {
-                                path: '/systemNoticeList',
-                                name: 'systemNoticeList',
-                                label: '系统通知',
-                                icon: 'setting',
-                                url: 'sys/systemNoticeList',
-                                index: '3-2'
-                            },
-                        ]
-                    },
-                    {
-                        label: '校园委托相关设置',
-                        icon: 's-custom',
-                        index: '4',
-                        children: [
-                            {
-                                path: '/delegationType',
-                                name: 'delegationType',
-                                label: '委托类别',
-                                icon: 'setting',
-                                url: 'setting/delegationType',
                                 index: '4-1'
                             },
                             {
@@ -277,15 +250,36 @@ export default {
                                 name: 'systemNoticeList',
                                 label: '系统通知',
                                 icon: 'setting',
-                                url: 'setting/systemNoticeList',
+                                url: 'sys/systemNoticeList',
                                 index: '4-2'
                             },
                         ]
                     },
                     {
+                        label: '校园委托相关设置',
+                        icon: 's-custom', index: '5',
+                        children: [
+                            {
+                                path: '/delegationType',
+                                name: 'delegationType',
+                                label: '委托类别',
+                                icon: 'setting',
+                                url: 'setting/delegationType',
+                                index: '5-1'
+                            },
+                            {
+                                path: '/systemNoticeList',
+                                name: 'systemNoticeList',
+                                label: '系统通知',
+                                icon: 'setting',
+                                url: 'setting/systemNoticeList',
+                                index: '5-2'
+                            },
+                        ]
+                    },
+                    {
                         label: '其他',
-                        icon: 'location',
-                        index: '5',
+                        icon: 'location', index: '6',
                         children: [
                             {
                                 path: '/page1',
@@ -293,7 +287,7 @@ export default {
                                 label: '页面1',
                                 icon: 'setting',
                                 url: 'Other/PageOne',
-                                index: '5-1'
+                                index: '6-1'
                             },
                             {
                                 path: '/page2',
@@ -301,7 +295,7 @@ export default {
                                 label: '页面2',
                                 icon: 'setting',
                                 url: 'Other/PageTwo',
-                                index: '5-2'
+                                index: '6-2'
                             },
                             {
                                 path: '/page3',
@@ -309,7 +303,7 @@ export default {
                                 label: '页面3',
                                 icon: 'setting',
                                 url: 'Other/PageThree',
-                                index: '5-3'
+                                index: '6-3'
                             },
                         ]
 
@@ -324,6 +318,9 @@ export default {
                     if (item.path === currentPath) {
                         this.$store.commit('selectMenu', item)
                         this.activeIndex = item.index;
+                        if (currentPath === '/home') {
+                            console.log('item:', this.menuData);
+                        }
                     }
                 } else {
                     item.children.forEach((child) => {
@@ -344,7 +341,7 @@ export default {
                 this.activeIndex = activeItem.index;
             } else {
 
-                this.activeIndex = 0; // 或默认值
+                this.activeIndex = 1; // 或默认值
             }
 
 

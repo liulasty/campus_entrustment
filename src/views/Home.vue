@@ -48,7 +48,7 @@
                     :body-style="{ display: 'flex', padding: '0px', 'align-items': 'center', height: '60px', padding: '5px', width: '190px', margin: '5px 5px' }">
                     <i class="icon" :class="`el-icon-${item.icon}`" :style="{ background: item.color }" />
                     <div class="detail">
-                        <p class="price">¥{{ item.value }}</p>
+                        <p class="price">{{ item.value }}条</p>
                         <p class="desc">{{ item.name }} 委托</p>
                     </div>
                 </el-card>
@@ -196,7 +196,7 @@ export default {
 
         getData(2).then((data) => {
             this.NewestInfo = data.data.data
-            console.log("快速信息展示", this.NewestInfo);
+            // console.log("快速信息展示", this.NewestInfo);
             this.tableData = this.NewestInfo.newestTask;
             this.countData.forEach(item => {
                 const key = item.name;

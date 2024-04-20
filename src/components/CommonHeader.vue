@@ -4,10 +4,10 @@
       <el-button @click="handleMenu" style="margin-right: 10px;" icon="el-icon-menu" size="medium"></el-button>
       <!-- 面包屑 -->
       <el-breadcrumb separator="/">
-        <!-- <el-breadcrumb-item v-for="item in tags" :key="item.path" :to="{ path: item.path }" :id="generateUniqueId(item)"
+        <el-breadcrumb-item v-for="item in tags" :key="item.path" :to="{ path: item.path }" :id="generateUniqueId(item)"
           :class="generateItemClass(item)">
           {{ item.label }}
-        </el-breadcrumb-item> -->
+        </el-breadcrumb-item>
 
       </el-breadcrumb>
 
@@ -61,11 +61,11 @@ export default {
 
   },
   watch: {
-    // '$route'(to, from) {
-    //   // 在路由变化时触发，你可以在这里更新面包屑的样式
-    //   // 比如根据当前路由信息 to 来设置面包屑样式
-    //   this.updateBreadcrumbStyle(to)
-    // },
+    '$route'(to, from) {
+      // 在路由变化时触发，你可以在这里更新面包屑的样式
+      // 比如根据当前路由信息 to 来设置面包屑样式
+      this.updateBreadcrumbStyle(to)
+    },
     showTooltip: function (newVal, oldVal) {
       // 在这里处理 showTooltip 值的变化
       console.log("newVal", newVal),
@@ -116,19 +116,20 @@ export default {
       let userId = this.$store.state.userInfo.userId
       // 删除JWT令牌
       localStorage.removeItem('jwtToken');
-      localStorage.removeItem('sportsUser');
+      localStorage.removeItem('TaskUser');
       if (userId > 0) {
         logout().then((data) => {
           console.log("退出登录", data)
 
 
-          this.$store.commit('removeUser');
-          window.location.reload();
+          // this.$store.commit('removeUser');
+          this.$router.push('/login');
+          // window.location.reload();
 
         })
       } else {
-
-        window.location.reload();
+        this.$router.push('/login');
+        // window.location.reload();
 
       }
 
@@ -140,9 +141,9 @@ export default {
   computed: {
     // ...mapState 意味着将 mapState 返回的所有属性都添加到 computed 对象中。
     //创建一个名为 tags 的计算属性，它将获取 Vuex 的状态中 state.tab.tabsList 的数据。
-    // ...mapState({
-    //   tags: state => state.tab.tabsList
-    // })
+    ...mapState({
+      tags: state => state.tab.tabsList
+    })
   },
   mounted() {
     // console.log(this.tags, 'tags')
@@ -207,7 +208,7 @@ export default {
 
       &:last-child {
         .el-breadcrumb__inner {
-          color: #fff;
+          // color: #fff;
         }
 
       }
@@ -216,7 +217,7 @@ export default {
     /deep/.current_bread {
       .el-breadcrumb__inner {
         color: aquamarine;
-        background-color: #e90c0c;
+        background-color: #0ce9ae;
       }
     }
   }

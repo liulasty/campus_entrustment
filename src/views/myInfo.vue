@@ -30,20 +30,6 @@
                         <el-input v-model="infoForm.age" controls-position="left" disabled></el-input>
                     </el-form-item>
 
-                    <el-form-item label="参赛年级" prop="grade">
-                        <el-radio-group v-model="infoForm.grade" disabled>
-                            <el-radio label="一年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="二年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="三年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="四年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="五年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="六年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="七年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="八年级" name="grade" style="height: 30px;"></el-radio>
-                            <el-radio label="九年级" name="grade" style="height: 30px;"></el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-
                     <el-form-item label="电话号码" prop="contact">
                         <el-input v-model="infoForm.contact" disabled></el-input>
                     </el-form-item>
@@ -62,7 +48,7 @@
 
         <div>
             <el-dialog title="申请认证" :visible.sync="dialogUserInfo">
-                <el-form :model="infoAddForm" ref="infoUpdateForm" label-width="100px" class="demo-infoUpdateForm">
+                <el-form :model="infoAddForm" label-width="100px" class="demo-infoUpdateForm">
                     <el-form-item label="姓名" prop="name">
                         <el-input v-model="infoAddForm.name"></el-input>
                     </el-form-item>
@@ -182,7 +168,11 @@ export default {
                 userId: this.$store.state.userInfo.userId
             },
             infoAddForm: {
-
+                name: '',
+                phone: '',
+                imgUrl: '',
+                qq: '',
+                role: 'student',
             },
             playerInfo: {
             },
@@ -198,25 +188,25 @@ export default {
 
 
             getUserInfo(this.userId).then((data) => {
-                console.log("用户账号id", data.data.code);
+                console.log("用户信息", data);
+                console.log("用户账号id", data.data.data);
                 if (data.data.code === 1) {
-                    const info = data.data.data
-                    console.log("用户信息", info);
-                    if (info == null) {
-                        this.updateButton(1)
-                    } else if (info.authStatus === 'AUTHENTICATING') {
+                    var info = data.data.data;
+                    if (info.authStatus && info.authStatus === '认证中') {
 
                         this.updateButton(2)
 
-                    } else if (info.authStatus === 'AUTHENTICATION_FAILED') {
-                        this.updateButton(3)
-                    } else {
+                    } else if (info.authStatus && info.authStatus === '认证通过') {
                         this.updateButton(4)
+                    } else {
+                        this.updateButton(3)
+                        this.infoForm = info
                     }
-                    console.log("展示页面", info.authStatus);
-                } else {
 
+                } else {
+                    this.updateButton(1)
                 }
+                console.log("展示页面", this.msg);
             })
         },
         updateButton(id) {
@@ -266,9 +256,13 @@ export default {
         applyForModification() {
             this.dialogUserInfo = true;
         },
-        submitAnApplication() {
-            this.$refs.imageSet.uploadImages();
+        async submitAnApplication() {
+
+            await this.$refs.imageSet.uploadImages();
             this.infoAddForm.imgUrl = this.$refs.imageSet.imageUrls[0].ossUrl;
+            console.log("提交认证信息图片1", this.$refs.imageSet.imageUrls[0].ossUrl);
+            console.log("提交认证信息图片2", this.infoAddForm);
+
             this.infoAddForm.id = this.$store.state.userInfo.userId;
             console.log(this.infoAddForm);
             submitCertificationInformation(this.infoAddForm).then((response) => {
@@ -278,6 +272,7 @@ export default {
                         message: response.data.msg,
                         type: 'success'
                     });
+                    this.updateButton(2)
                 } else {
                     this.$message({
                         message: response.data.msg,

@@ -1,13 +1,41 @@
+
 import http from '../utils/request'
 
 // import aliyun from '../utils/ailiyun.js'
 
 export const getData = (id) => {
-    return http.get('task/getNewTask/' + id)
+    return http.get('/task/getNewTask/' + id)
 }
 
 export const userList = (data) => {
-    return http.post('user/page', data)
+    return http.post('/user/page', data)
+}
+
+export const adminActivation = (id) => {
+    console.log("辅助激活用户");
+    return http.put('/user/adminActivation/' + id)
+}
+
+
+export const deleteAccounts = (data) => {
+    if (!Array.isArray(data)) {
+        data = [data];
+    }
+
+
+    console.log(data.length === 1 ? "删除单个用户" : "批量删除用户", data);
+
+    if (data.length === 0) {
+        throw new Error("Empty input. Expected at least one userId.");
+    }
+
+    return http.post('/user/deleteUser', data);
+}
+
+
+export const getTaskList = (data) => {
+    console.log("获取委托列表");
+    return http.post('/task/page', data)
 }
 
 export const getTaskCategories = (id) => {
@@ -57,7 +85,7 @@ export const getReason = (id) => {
 }
 
 export const getUserInfo = (id) => {
-    console.log("获取用户信息");
+    // console.log("获取用户信息");
     return http.get('/userInfo/' + id)
 }
 
@@ -72,13 +100,64 @@ export const submitCertificationInformation = (data) => {
     return http.post('/userInfo', data)
 }
 
+
+export const confirmToPassTheReview = (id) => {
+    console.log("确认通过审核");
+    return http.put('/userInfo/confirmToPassTheReview/' + id)
+}
+
+
+export const refuseToPassReview = (id) => {
+    console.log("拒绝通过审核");
+    return http.put('/userInfo/refuseToPassReview/' + id)
+}
+
 export const getUserList = (listSelectCondition) => {
-    console.log("查询参数", listSelectCondition);
-    return http.get('/users/page', {
+    // console.log("查询参数", listSelectCondition);
+    return http.get('/user/page', {
         params: listSelectCondition,
     })
 }
+// 查询存储委托信息审核记录列表
+export function listDelegateauditrecords(query) {
+    return http.get('/delegateauditrecords/list', {
+        params: query
+    })
 
+}
+
+// 查询存储委托信息审核记录详细
+export function getDelegateauditrecords(RecordID) {
+    return http.get('/delegateauditrecords/' + RecordID)
+}
+
+// 新增存储委托信息审核记录
+export function addDelegateauditrecords(data) {
+    return http.post('/delegateauditrecords', data)
+
+}
+
+// 修改存储委托信息审核记录
+export function updateDelegateauditrecords(data) {
+    return http.put('/delegateauditrecords', data)
+}
+
+// 删除存储委托信息审核记录
+export function delDelegateauditrecords(RecordID) {
+    return http.delete('/delegateauditrecords/' + RecordID)
+}
+
+
+export const deleteCertificationRecords = (id) => {
+    // console.log("删除认证记录");
+    return http.delete('/userInfo/' + id)
+}
+
+// cancelUserInfoAuthentication
+export const cancelUserInfoAuthentication = (id) => {
+    // console.log("取消认证");
+    return http.put('/userInfo/cancelUserInfoAuthentication/' + id)
+}
 export const uploadAvatar = (file) => {
     const formData = new FormData();
     formData.append('file', file);
