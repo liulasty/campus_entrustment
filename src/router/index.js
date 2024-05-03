@@ -13,7 +13,7 @@ import EventItem from '../views/EventItem.vue'
 import AthleteApplication from '../views/AthleteApplication.vue'
 import User from '../views/User.vue'
 import myInfo from '../views/myInfo.vue'
-import CreateDelegation from '@/views/CreateDelegation.vue'
+import CreateDelegation from '@/views/user/CreateDelegation.vue'
 import UserList from '@/views/admin/UserList.vue'
 import DraftList from '@/views/admin/DraftList.vue'
 import AuditList from '@/views/admin/AuditList.vue'
@@ -22,6 +22,7 @@ import DelegationUpdateRecords from '@/views/admin/DelegationUpdateRecords.vue'
 import SystemBulletinList from '@/views/admin/SystemBulletinList.vue'
 import SystemNoticeList from '@/views/admin/SystemNoticeList.vue'
 import DelegationType from '@/views/admin/DelegationType.vue'
+import ViewOnGoingList from '@/views/user/ViewOnGoingList.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -43,7 +44,7 @@ const routes = [
                 }
             },
             { path: '/home', name: 'home', component: Home },
-            { path: '/CreateDelegation', name: 'event', component: CreateDelegation },
+            { path: '/createDelegation', name: 'createDelegation', component: CreateDelegation },
             { path: '/user', name: 'user', component: User },
             { path: '/athlete', name: 'athlete', component: Athlete },
             { path: '/eventItem', name: 'eventItem', component: EventItem },
@@ -60,6 +61,7 @@ const routes = [
             { path: '/systemBulletinList', name: 'systemBulletinList', component: SystemBulletinList },
             { path: '/systemNoticeList', name: 'systemNoticeList', component: SystemNoticeList },
             { path: '/delegationType', name: 'delegationType', component: DelegationType },
+            { path: '/viewOnGoingList', name: 'viewOnGoingList', component: ViewOnGoingList }
         ]
     },
     // 默认页面

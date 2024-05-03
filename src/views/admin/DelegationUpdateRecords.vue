@@ -6,9 +6,10 @@
                 <el-input v-model="queryParams.DelegateID" placeholder="请输入委托任务ID" clearable
                     @keyup.enter.native="handleQuery" />
             </el-form-item>
-            <el-form-item label="管理员ID" prop="UserID">
-                <el-input v-model="queryParams.UserID" placeholder="请输入管理员ID" clearable
-                    @keyup.enter.native="handleQuery" />
+            <el-form-item label="审核结果状态" prop="ReviewStatus">
+                <el-select v-model="queryParams.ReviewStatus" placeholder="请选择审核结果状态" clearable>
+                    <el-option v-for="dict in type" :key="dict.value" :label="dict.label" :value="dict.value" />
+                </el-select>
             </el-form-item>
             <el-form-item label="审核完成时间" prop="ReviewTime">
                 <el-date-picker clearable v-model="queryParams.ReviewTime" type="date" value-format="yyyy-MM-dd"
@@ -33,7 +34,7 @@
                 <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple"
                     @click="handleDelete">删除</el-button>
             </el-col>
-            <!-- <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar> -->
+
         </el-row>
 
         <el-table v-loading="loading" :data="delegateauditrecordsList" @selection-change="handleSelectionChange">
@@ -90,7 +91,7 @@
 </template>
 
 <script>
-import { listDelegateauditrecords, getDelegateauditrecords, delDelegateauditrecords, addDelegateauditrecords, updateDelegateauditrecords } from "@/api/";
+import { listDelegateRecords, getDelegateauditrecords, delDelegateauditrecords, addDelegateauditrecords, updateDelegateauditrecords } from "@/api/";
 
 import initLayui from "@/layui/layuiInit";
 
@@ -126,6 +127,12 @@ export default {
                 ReviewComment: null,
                 ReviewTime: null
             },
+            // 类型数组
+            type: [
+                { label: "已批准", value: 1 },
+                { label: "已拒绝", value: 2 },
+                { label: "待定", value: 3 }
+            ],
             // 表单参数
             form: {},
             // 表单校验
@@ -137,7 +144,7 @@ export default {
                     { required: true, message: "管理员ID不能为空", trigger: "blur" }
                 ],
                 ReviewStatus: [
-                    { required: true, message: "审核结果状态“已批准”、“已拒绝”、“待定”不能为空", trigger: "change" }
+                    { required: true, message: "审核结果状态不能为空", trigger: "change" }
                 ],
             }
         };
@@ -176,7 +183,8 @@ export default {
         /** 搜索按钮操作 */
         handleQuery() {
             this.queryParams.pageNum = 1;
-            this.getList();
+            console.log("搜索参数：", this.queryParams);
+            // this.getList();
         },
         /** 重置按钮操作 */
         resetQuery() {

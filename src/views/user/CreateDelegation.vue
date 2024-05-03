@@ -15,7 +15,7 @@
 
 import Delegation from '@/components/Delegation.vue';
 
-import { getTaskCategories, getTaskDraftById } from '@/api/index';
+import { getTaskCategories, getTaskDraftById, getUserInfo } from '@/api/index';
 
 
 
@@ -103,9 +103,31 @@ export default {
                 });
                 this.tasks = data.data.data;
             })
-        }
+        },
+        //查询用户认证信息,
+        getUserInfoBefore() {
+            console.log("获取用户信息");
+            getUserInfo(this.$store.state.userInfo.userId).then((data) => {
+
+                if (data.data.code === 1) {
+                    console.log("用户信息", data.data.data);
+                    this.userInfo = data.data.data;
+                    if (this.userInfo.authStatus != "认证通过") {
+                        this.$message({
+                            message: "请先完成认证",
+                            type: 'error'
+                        });
+                        this.$router.push("/userInfo");
+                    }
+
+                } else {
+                    console.log("用户信息", data.data.msg);
+                }
+            })
+        },
     },
     mounted() {
+        this.getUserInfoBefore();
         this.setContext();
         this.getTaskDraft();
         // console.log("id=", this.$store.state.userInfo.userId);

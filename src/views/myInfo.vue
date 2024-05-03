@@ -18,32 +18,25 @@
                     <el-form-item label="姓名" prop="name">
                         <el-input v-model="infoForm.name" class="form-item-input" disabled></el-input>
                     </el-form-item>
-
-                    <el-form-item label="性别" prop="gender">
-                        <div class="form-item-input">
-                            <el-radio v-model="infoForm.gender" label="男" disabled>男</el-radio>
-                            <el-radio v-model="infoForm.gender" label="女" disabled>女</el-radio>
-                        </div>
+                    <el-form-item label="电话号码" prop="age">
+                        <el-input v-model="infoForm.phoneNumber" controls-position="left" disabled></el-input>
                     </el-form-item>
-
-                    <el-form-item label="年龄" prop="age">
-                        <el-input v-model="infoForm.age" controls-position="left" disabled></el-input>
+                    <el-form-item label="认证通过时间" prop="certifiedTime">
+                        <el-input v-model="infoForm.certifiedTime" controls-position="left" disabled></el-input>
                     </el-form-item>
-
-                    <el-form-item label="电话号码" prop="contact">
-                        <el-input v-model="infoForm.contact" disabled></el-input>
+                    <el-form-item label="qq号" prop="contact">
+                        <el-input v-model="infoForm.qqNumber" disabled></el-input>
                     </el-form-item>
-
-
+                    <el-form-item label="认证身份" prop="userRole">
+                        <el-input v-model="infoForm.userRole" disabled></el-input>
+                    </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="applyForModification()">申请修改</el-button>
-                        <el-button @click="CancelAuthentication('infoForm')">取消认证</el-button>
+                        <el-button @click="cancelAuthentication()">取消认证</el-button>
                     </el-form-item>
                 </el-form>
             </div>
-            <div>
-                <el-input v-model="infoForm.name" class="form-item-input" disabled></el-input>
-            </div>
+
         </div>
 
         <div>
@@ -124,9 +117,10 @@
     </div>
 </template>
 <script>
-import { getUserInfo, submitCertificationInformation } from '@/api'
+import { getUserInfo, submitCertificationInformation, deleteAuthenticationInformation } from '@/api'
 import { updateAthlete } from '@/api'
 import ImageUploader from '@/components/ImageUploader.vue'
+import { executeConfirmedRequest } from '@/utils/globalConfirmAction'
 
 export default {
     components: { ImageUploader },
@@ -189,7 +183,7 @@ export default {
 
             getUserInfo(this.userId).then((data) => {
                 console.log("用户信息", data);
-                console.log("用户账号id", data.data.data);
+                console.log("用户信息", data.data.data);
                 if (data.data.code === 1) {
                     var info = data.data.data;
                     if (info.authStatus && info.authStatus === '认证中') {
@@ -198,15 +192,16 @@ export default {
 
                     } else if (info.authStatus && info.authStatus === '认证通过') {
                         this.updateButton(4)
+                        this.infoForm = info
                     } else {
                         this.updateButton(3)
-                        this.infoForm = info
+
                     }
 
                 } else {
                     this.updateButton(1)
                 }
-                console.log("展示页面", this.msg);
+                console.log("展示页面", this.msg, this.code);
             })
         },
         updateButton(id) {
@@ -260,8 +255,8 @@ export default {
 
             await this.$refs.imageSet.uploadImages();
             this.infoAddForm.imgUrl = this.$refs.imageSet.imageUrls[0].ossUrl;
-            console.log("提交认证信息图片1", this.$refs.imageSet.imageUrls[0].ossUrl);
-            console.log("提交认证信息图片2", this.infoAddForm);
+            // console.log("提交认证信息图片1", this.$refs.imageSet.imageUrls[0].ossUrl);
+            // console.log("提交认证信息图片2", this.infoAddForm);
 
             this.infoAddForm.id = this.$store.state.userInfo.userId;
             console.log(this.infoAddForm);
@@ -281,6 +276,11 @@ export default {
                 }
 
             })
+        },
+        async cancelAuthentication() {
+            console.log("取消认证,删除认证信息", this.infoForm.userId);
+            await executeConfirmedRequest(deleteAuthenticationInformation, this.infoForm.userId, "是否确认取消用户认证？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
+            this.getInfo();
         }
     }
 }

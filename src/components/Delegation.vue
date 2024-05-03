@@ -50,13 +50,13 @@
                     <el-table :data="tasks" max-height="400">
                         <el-table-column prop="taskId" label="编号" v-if="showTypeColumn">
                         </el-table-column>
-                        <el-table-column prop="type" label="类型" width="100">
+                        <el-table-column prop="type" label="类型" width="110">
                         </el-table-column>
                         <el-table-column prop="location" label="地点" width="70">
                         </el-table-column>
                         <el-table-column prop="description" label="内容" width="120" show-overflow-tooltip>
                         </el-table-column>
-                        <el-table-column prop="createTime" label="创建时间" width="150">
+                        <el-table-column prop="createTime" label="创建时间" width="160">
                         </el-table-column>
                         <el-table-column label="操作" fixed="right" width="340">
                             <template slot-scope="scope">
@@ -90,7 +90,7 @@
 
             </el-col>
         </el-row>
-        // 编辑委托窗口
+
         <el-dialog title="编辑" :visible.sync="dialogVisibleEdit" width="30%">
             <el-form ref="DraftFrom" :model="DraftFrom" label-width="100px" size="mini">
                 <el-form-item label="委托类型">
@@ -134,6 +134,39 @@
 
         </el-dialog>
 
+        <el-dialog title="发布委托" :visible.sync="dialogVisiblePublish" height="70%">
+            <el-form ref="publishFrom" :model="publishFrom" label-width="100px" size="mini">
+                <el-form-item label="委托类型">
+                    {{ publishFrom.type }}
+                </el-form-item>
+                <el-form-item label="委托内容描述">
+                    {{ publishFrom.description }}
+
+                </el-form-item>
+                <el-form-item label="委托地点">
+                    {{ publishFrom.location }}
+                </el-form-item>
+                <el-form-item label="委托发布时间">
+                    <el-date-picker clearable v-model="publishFrom.startTime" type="datetime"
+                        value-format="yyyy年MM月dd日HH:mm:ss" placeholder="请选择委托发布时间">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="委托截止时间">
+                    <el-date-picker clearable v-model="publishFrom.endTime" type="datetime"
+                        value-format="yyyy年MM月dd日HH:mm:ss" placeholder="请选择委托截止时间">
+                    </el-date-picker>
+                </el-form-item>
+
+                <el-form-item size="large">
+                    <el-button type="primary" @click.prevent="publishDelegation()" size="large">发布委托</el-button>
+                    <el-button type="info" @click="dialogVisiblePublish = false">暂不发布</el-button>
+                </el-form-item>
+            </el-form>
+
+        </el-dialog>
+
+
+
 
     </div>
 
@@ -142,7 +175,7 @@
 
 import {
     addTaskDraft, updateTaskDraft, getDraftDetailsBasedOnCommissionId, deleteTaskDraft, submitTaskDraft,
-    confirmTask, getReason
+    confirmTask, getReason, publishingDelegation
 } from "@/api/index"
 
 export default {
@@ -183,9 +216,13 @@ export default {
         return {
             dialogVisibleEdit: false,
             dialogVisibleReason: false,
+            dialogVisiblePublish: false,
             DelegationFrom: {
                 content: '',
                 location: ''
+            },
+            publishFrom: {
+
             },
             DraftFrom: {
                 taskId: 0,
@@ -271,9 +308,7 @@ export default {
         //更新草稿
         handleEdit(row) {
             console.log(row.taskId);
-
-
-            console.log("类型数组", this.taskTypeOption)
+            // console.log("类型数组", this.taskTypeOption)
 
             getDraftDetailsBasedOnCommissionId(row.taskId).then((data) => {
                 console.log(data.data);
@@ -352,23 +387,57 @@ export default {
             )
 
         },
-        //确认发布
+        //打开确认发布窗口
         handleAudit(data) {
+            this.dialogVisiblePublish = true;
             confirmTask(data.taskId).then(data => {
                 if (data.data.code == 1) {
                     this.$message({
                         type: 'success',
                         message: data.data.msg
                     });
+                    this.publishFrom = data.data.data;
+                    console.log(this.taskTypeOption);
+                    this.publishFrom.type = this.taskTypeOption[this.publishFrom.type - 1].label;
                 } else {
+                    this.dialogVisiblePublish = false;
                     this.$message({
                         type: 'error',
                         message: data.data.msg
                     });
+
                 }
-                this.$emit('childEvent');
             })
         },
+        //发布委托
+        publishDelegation() {
+            console.log("即将发布的委托", this.publishFrom);
+            const publish = {
+                id: this.publishFrom.taskId,
+                start: this.publishFrom.startTime,
+                end: this.publishFrom.endTime
+            }
+            publishingDelegation(publish).then((data) => {
+                if (data.data.code === 1) {
+                    this.$message({
+                        message: data.data.msg,
+                        type: 'success'
+                    });
+
+                } else {
+                    this.$message({
+                        message: data.data.msg,
+                        type: 'error'
+                    });
+                }
+                this.$emit('childEvent');
+                this.dialogVisiblePublish = false;
+            })
+        },
+
+
+
+
         //查看审核未通过原因
         handleDetail(val) {
             getReason(val.taskId).then((data) => {
@@ -384,6 +453,9 @@ export default {
                 }
             })
         },
+        cancel(form) {
+            this.resetForm(form);
+        }
 
     },
     mounted() {

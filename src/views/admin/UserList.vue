@@ -225,6 +225,7 @@ export default {
                 console.log("展示的数据：", this.tableData);
             })
         },
+        //单个删除用户
         handleDelete(id) {
             deleteAccounts(id).then((res) => {
                 console.log("删除成功");

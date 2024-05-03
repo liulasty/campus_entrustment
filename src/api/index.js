@@ -4,10 +4,12 @@ import http from '../utils/request'
 // import aliyun from '../utils/ailiyun.js'
 
 export const getData = (id) => {
+    console.log("获取最新委托");
     return http.get('/task/getNewTask/' + id)
 }
 
 export const userList = (data) => {
+    console.log("获取委托列表");
     return http.post('/user/page', data)
 }
 
@@ -74,8 +76,13 @@ export const submitTaskDraft = (id) => {
 }
 
 export const confirmTask = (id) => {
-    console.log("确认发布委托");
-    return http.put('/task/confirmTask/' + id)
+    console.log("获取需要发布的委托");
+    return http.get('/task/confirmTask/' + id)
+}
+
+export const publishingDelegation = (data) => {
+    console.log("发布委托");
+    return http.put('/user/publisher/confirmTask/' + data.id, data)
 }
 
 
@@ -101,6 +108,8 @@ export const submitCertificationInformation = (data) => {
 }
 
 
+
+
 export const confirmToPassTheReview = (id) => {
     console.log("确认通过审核");
     return http.put('/userInfo/confirmToPassTheReview/' + id)
@@ -118,12 +127,16 @@ export const getUserList = (listSelectCondition) => {
         params: listSelectCondition,
     })
 }
-// 查询存储委托信息审核记录列表
-export function listDelegateauditrecords(query) {
-    return http.get('/delegateauditrecords/list', {
+// 查询存储委托信息记录列表
+export function listDelegateRecords(query) {
+    console.log("查询存储委托信息记录列表:");
+    return http.get('/admin/task/list', {
         params: query
     })
+}
 
+export function getDelegateByTaskID(TaskID) {
+    return http.get('/admin/task/' + TaskID)
 }
 
 // 查询存储委托信息审核记录详细
@@ -153,11 +166,40 @@ export const deleteCertificationRecords = (id) => {
     return http.delete('/userInfo/' + id)
 }
 
-// cancelUserInfoAuthentication
+export const deleteAuthenticationInformation = (id) => {
+    // console.log("删除认证信息");
+    return http.delete('/userInfo/' + id)
+}
+
+// 
 export const cancelUserInfoAuthentication = (id) => {
     // console.log("取消认证");
     return http.put('/userInfo/cancelUserInfoAuthentication/' + id)
 }
+
+export const delDelegate = (id) => {
+    // console.log("管理员删除委托信息");
+    return http.delete('/admin/task/' + id)
+}
+
+
+export const FallbackDraft = (id) => {
+    console.log("管理员回退草稿");
+    return http.put('/admin/task/getFallbackDraft/' + id)
+}
+
+
+export const allowPublish = (id) => {
+    console.log("管理员允许发布");
+    return http.put('/admin/task/allowPublish/' + id)
+}
+
+export const notAllowed = (id) => {
+    console.log("管理员拒绝发布");
+    return http.put('/admin/task/notAllowed/' + id)
+}
+
+
 export const uploadAvatar = (file) => {
     const formData = new FormData();
     formData.append('file', file);
