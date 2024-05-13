@@ -50,20 +50,18 @@
 
         <!-- 添加或修改存储委托信息审核记录对话框 -->
         <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-            <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+            <el-form ref="form" :model="form" label-width="120px">
                 <el-form-item label="委托任务ID" prop="DelegateID">
-                    <el-input v-model="form.DelegateID" placeholder="请输入委托任务ID" />
+                    {{form.taskId}}
                 </el-form-item>
                 <el-form-item label="管理员ID" prop="UserID">
-                    <el-input v-model="form.UserID" placeholder="请输入管理员ID" />
+                    {{form.userId}}
                 </el-form-item>
                 <el-form-item label="审核意见或说明" prop="ReviewComment">
-                    <el-input v-model="form.ReviewComment" type="textarea" placeholder="请输入内容" />
+                    {{form.updateDescription}}
                 </el-form-item>
                 <el-form-item label="审核完成时间" prop="ReviewTime">
-                    <el-date-picker clearable v-model="form.ReviewTime" type="date" value-format="yyyy-MM-dd"
-                        placeholder="请选择审核完成时间">
-                    </el-date-picker>
+                    {{form.updateTime}}
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -205,12 +203,12 @@
             },
             /** 查看按钮操作 */
             handleView(row) {
-                this.reset();
-                const RecordID = row.RecordID
+                // this.reset();
+                const RecordID = row.updateId
                 getViewDelegateRecord(RecordID).then(response => {
-                    this.form = response.data;
+                    this.form = response.data.data;
                     this.open = true;
-                    this.title = "修改存储委托信息审核记录";
+                    this.title = "查看委托信息审核记录";
                 });
             },
             /** 删除按钮操作 */

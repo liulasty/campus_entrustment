@@ -301,35 +301,27 @@
                             ]
                         },
                         {
-                            label: '其他',
-                            icon: 'location', index: '6',
+                            label: "消息管理",
+                            icon: "bell",
+                            index: "6",
                             children: [
                                 {
-                                    path: '/page1',
-                                    name: 'page1',
-                                    label: '页面1',
-                                    icon: 'setting',
-                                    url: 'Other/PageOne',
+                                    path: '/notificationReadStatus',
+                                    name: 'notificationReadStatus',
+                                    label: '消息通知',
+                                    icon: 's-comment',
+                                    url: 'Other/PageThree',
                                     index: '6-1'
                                 },
                                 {
-                                    path: '/page2',
-                                    name: 'page2',
-                                    label: '页面2',
-                                    icon: 'setting',
-                                    url: 'Other/PageTwo',
-                                    index: '6-2'
-                                },
-                                {
-                                    path: '/page3',
-                                    name: 'page3',
-                                    label: '页面3',
-                                    icon: 'setting',
+                                    path: '/notifications',
+                                    name: 'notifications',
+                                    label: '消息管理',
+                                    icon: 'chat-dot-square',
                                     url: 'Other/PageThree',
-                                    index: '6-3'
-                                },
+                                    index: '6-2'
+                                }
                             ]
-
                         }
                     ]
                 }

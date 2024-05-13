@@ -1,4 +1,5 @@
 
+import { data } from 'jquery';
 import http from '../utils/request'
 
 // import aliyun from '../utils/ailiyun.js'
@@ -230,10 +231,106 @@ export const getViewDelegateRecord = (id) => {
 }
 
 export const getSystemBulletinList = (query) => {
-    console.log("获取系统公告列表");
+    // console.log("获取系统公告列表");
     return http.get('/system-announcements/list', {
         params: query
     })
+}
+
+export const deleteSystemBulletin = (id) => {
+    console.log("删除系统公告");
+    return http.delete('/system-announcements/' + id)
+}
+
+export const getSystemBulletinById = (id) => {
+    // console.log("获取系统公告详情");
+    return http.get('/system-announcements/' + id)
+}
+
+export const updateSystemBulletin = (data) => {
+    // console.log("修改系统公告", data);
+    return http.put('/system-announcements', data)
+}
+
+
+export const listNotifications = (query) => {
+    console.log("获取通知列表");
+    return http.get('/notifications/list', {
+        params: query
+    })
+}
+
+
+export const getNotificationsType = () => {
+    console.log("获取通知类型");
+    return http.get('/notifications/type')
+}
+
+export const addNotification = (data) => {
+    console.log("添加通知", data);
+
+    return http.post('/notifications', data)
+}
+
+export const sendNotification = (data) => {
+    console.log("发送通知", data);
+
+    return http.post('/notifications/send', data)
+}
+
+export const getNotificationById = (id) => {
+    console.log("获取通知详情", id);
+    return http.get('/notifications/' + id)
+}
+
+export const updateNotificationAdmin = (data) => {
+    console.log("修改通知", data);
+    return http.put('/notifications', data)
+}
+
+export const delNotification = (id) => {
+    console.log("删除通知", id);
+    return http.delete('/notifications/' + id)
+}
+
+export const listNotificationReadRecords = (data) => {
+    console.log("查看消息读取记录");
+
+    return http.get("/notificationReadStatus/list", {
+        params: data
+    })
+}
+
+export const getDelegationTypeList = (query) => {
+    console.log("获取委托类型列表");
+    return http.get('/delegation_categories/list', {
+        params: query
+    })
+}
+
+export const getDelegationTypeById = (id) => {
+    console.log("获取委托类型详情", id);
+    return http.get('/delegation_categories/' + id)
+}
+
+export const updateDelegationTypeAdmin = (data) => {
+    console.log("修改委托类型", data);
+    return http.put('/delegation_categories', data)
+}
+
+export const addDelegationTypeAdmin = (data) => {
+    console.log("添加委托类型", data);
+    return http.post('/delegation_categories', data)
+}
+
+export const deleteDelegationType = (id) => {
+    console.log("删除委托类型", id);
+    return http.delete('/delegation_categories/' + id)
+}
+
+export const enableDelegationType = (id) => {
+    console.log("更改委托委托类型", id);
+    return http.put('/delegation_categories/enable/' + id)
 }
 
 export const uploadAvatar = (file) => {

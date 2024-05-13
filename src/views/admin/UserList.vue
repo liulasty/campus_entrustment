@@ -32,8 +32,8 @@
                 </div>
             </el-col>
         </el-row>
-        <div>
-            <div style="margin-top: 20px">
+        <div style="margin-top: 20px;">
+            <div style="margin-bottom: 20px">
                 <el-button @click="deleteAndSelectAllAccounts()">删除选中所有账号</el-button>
                 <el-button @click="toggleSelection()">取消选择</el-button>
             </div>

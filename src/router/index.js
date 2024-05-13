@@ -25,6 +25,8 @@ import ViewOnGoingList from '@/views/user/ViewOnGoingList.vue'
 import MyDelegationAcceptList from '@/views/user/MyDelegationAcceptList.vue'
 import MyDelegationPublishList from '@/views/user/MyDelegationPublishList.vue'
 import ExpireDelegationList from '@/views/admin/ExpireDelegationList.vue'
+import Notifications from '@/views/admin/Notifications.vue'
+import NotificationReadStatus from '@/views/admin/NotificationReadStatus.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -66,7 +68,9 @@ const routes = [
             { path: '/viewOnGoingList', name: 'viewOnGoingList', component: ViewOnGoingList },
             { path: '/myDelegationPublishList', name: 'myDelegationPublishList', component: MyDelegationPublishList },
             { path: '/myDelegationAcceptList', name: 'myDelegationAcceptList', component: MyDelegationAcceptList },
-            { path: '/expireDelegationList', name: 'expireDelegationList', component: ExpireDelegationList }
+            { path: '/expireDelegationList', name: 'expireDelegationList', component: ExpireDelegationList },
+            { path: '/notifications', name: 'notifications', component: Notifications },
+            { path: '/notificationReadStatus', name: 'notificationReadStatus', component: NotificationReadStatus },
 
         ]
     },

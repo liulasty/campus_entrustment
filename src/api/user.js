@@ -1,11 +1,14 @@
 
-import { data } from 'jquery'
 import http from '../utils/request'
 
 export const listViewOnGoingList = (data) => {
     return http.get('/user/task/page', {
         params: data,
     })
+}
+
+export const getTaskCategoriesUser = () => {
+    return http.get('/user/task/categories')
 }
 
 
@@ -42,4 +45,13 @@ export const cancelAcceptorByAcceptor = (id) => {
 
 export const confirmTheRecipient = (id) => {
     return http.put('/user/publisher/confirm/' + id)
+}
+
+export const getPersonalNoticeList = (data) => {
+    return http.get('/notifications/getList/' + data)
+}
+
+
+export const getNoticeById = (id) => {
+    return http.get('/notifications/info/' + id)
 }
