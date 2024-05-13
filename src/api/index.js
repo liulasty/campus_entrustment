@@ -135,6 +135,19 @@ export function listDelegateRecords(query) {
     })
 }
 
+
+export function listDelegateUpdateRecords(query) {
+    console.log("查询存储委托信息更新记录列表:");
+    return http.get('/taskUpdate/list', {
+        params: query
+    })
+}
+
+export const getDelegateUpdateType = () => {
+    console.log("获取委托记录更新记录类型");
+    return http.get('/taskUpdate/type')
+}
+
 export function getDelegateByTaskID(TaskID) {
     return http.get('/admin/task/' + TaskID)
 }
@@ -199,6 +212,29 @@ export const notAllowed = (id) => {
     return http.put('/admin/task/notAllowed/' + id)
 }
 
+
+export const handleEnableAdmin = (id) => {
+    console.log("管理员启用用户");
+    return http.put('/user/handleEnableByAdmin/' + id)
+}
+
+export const handleDisableAdmin = (id) => {
+    console.log("管理员禁用用户");
+    return http.put('/user/handleDisableByAdmin/' + id)
+};
+
+
+export const getViewDelegateRecord = (id) => {
+    console.log("获取委托记录");
+    return http.get('/taskUpdate/getTask/' + id)
+}
+
+export const getSystemBulletinList = (query) => {
+    console.log("获取系统公告列表");
+    return http.get('/system-announcements/list', {
+        params: query
+    })
+}
 
 export const uploadAvatar = (file) => {
     const formData = new FormData();

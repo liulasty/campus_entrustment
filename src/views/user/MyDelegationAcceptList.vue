@@ -25,8 +25,8 @@
             </el-form-item>
             <el-form-item label="发布时间" prop="queryRules" class="input-reader-name">
                 <el-select v-model="queryParams.queryRules">
-                    <el-option label="最新" value="0" />
-                    <el-option label="最早" value="1" />
+                    <el-option label="最新" value="1" />
+                    <el-option label="最早" value="0" />
                 </el-select>
             </el-form-item>
             <el-form-item>
@@ -38,13 +38,13 @@
 
 
         <el-table v-loading="loading" :data="viewOnGoingList" :row-style="{ height: '50px' }">
-            <el-table-column label="委托发布者ID" align="center" prop="ownerId" />
             <el-table-column label="委托类型" align="center" prop="type" />
             <el-table-column label="委托描述" align="center" prop="description" show-overflow-tooltip />
-            <el-table-column label="委托发布时间" align="center" prop="startTime" />
-            <el-table-column label="委托截止时间" align="center" prop="endTime" />
+            <el-table-column label="委托留言时间" align="center" prop="acceptTime" />
+            <el-table-column label="委托留言" align="center" prop="str" />
             <el-table-column label="委托任务地点" align="center" prop="location" />
-            <el-table-column label="委托状态" align="center" prop="status" width="180" />
+            <el-table-column label="委托状态" align="center" prop="taskStatus" width="180" />
+            <el-table-column label="委托处理状态" align="center" prop="status" />
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" icon="el-icon-view"
@@ -89,7 +89,7 @@
                     </el-form-item>
                 </el-form-item>
                 <el-form-item label="留言" prop="delegationStr">
-                    <el-input type="textarea" v-model="delegationStr" size="large" rows="4" maxlength="80"></el-input>
+                    {{ form.acceptMessage}}
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -111,7 +111,7 @@
 </template>
 <script>
     import { getTaskCategories } from '@/api/'
-    import { listViewOnGoingList, queryTheEntrustmentDetailsByEntrustmentNumber, acceptCommission } from '@/api/user.js'
+    import { acceptDelegationList, queryTheEntrustmentDetailsByEntrustmentNumber, acceptCommission, cancelAcceptorByAcceptor, getTaskAcceptById } from '@/api/user.js'
     import { executeConfirmedRequest } from '@/utils/globalConfirmAction.js'
     export default {
         data() {
@@ -120,6 +120,7 @@
                 loading: true,
                 //委托留言
                 delegationStr: "",
+
                 // 显示搜索条件
                 showSearch: true,
                 // 总条数
@@ -127,7 +128,7 @@
                 // 存储委托记录表格数据
                 viewOnGoingList: [],
                 // 弹出层标题
-                title: "委托详情",
+                title: "",
                 // 是否显示弹出层
                 open: false,
                 // 查询参数
@@ -171,18 +172,37 @@
                 taskType: {
                 },
                 operations: {
-                    "委托发布中": {
+                    "待处理": {
                         index: 0,
-                        title: ["接受委托", "取消"],
-                        type: ["success", "info"],
-                        click: ["acceptsTheEntrustment", "cancel"]
+                        title: ["取消待接收"],
+                        type: ["info"],
+                        click: ["cancelAcceptor"]
                     },
-                    "已接受": {
+                    "已取消": {
                         index: 1,
+                        title: [],
+                        type: [],
+                        click: []
+                    },
+                    "已过期": {
+                        index: 2,
+                        title: [],
+                        type: [],
+                        click: []
+                    },
+                    "未选中": {
+                        index: 3,
+                        title: [],
+                        type: [],
+                        click: []
+                    },
+                    "已接收": {
+                        index: 4,
                         title: ["觉得很赞", "觉得很差"],
                         type: ["success", "warning"],
                         click: ["increaseGood", "increaseBad"]
-                    }
+                    },
+
                 },
                 operation: {},
                 //身份信息
@@ -198,7 +218,8 @@
                     usersInfo: {
                         name: "",
                     },
-                    task: {}
+                    task: {},
+                    acceptMessage: "",
                 },
             };
         },
@@ -248,15 +269,15 @@
             },
             getList() {
                 this.loading = true;
-                listViewOnGoingList(this.queryParams).then(response => {
+                acceptDelegationList(this.queryParams).then(response => {
                     if (response.data.code == 1) {
                         this.viewOnGoingList = response.data.data.records.map((record) => {
 
-                            record.type = this.taskType[`${record.type}`]; // 确保类型安全
+                            record.type = this.taskType[`${record.taskType}`]; // 确保类型安全
 
                             return record;
                         });
-
+                        console.log("列表数据", this.viewOnGoingList);
 
                         this.total = response.total;
                         this.loading = false;
@@ -273,16 +294,30 @@
             },
             handleView(row) {
                 console.log(row);
-                queryTheEntrustmentDetailsByEntrustmentNumber(row.taskId).then(response => {
+                this.delegationStr = ""
+                getTaskAcceptById(row.taskId).then(response => {
                     if (response.data.code === 1) {
-
-                        this.form = response.data.data;
-                        console.log(this.form);
-                        this.form.usersInfo.userRole = this.identity[this.form.usersInfo.userRole];
-                        this.form.task.type = this.taskType[`${this.form.task.type}`];
-                        console.log("form", this.form.task.status);
-                        this.operation = this.operations[`${this.form.task.status}`];
-                        this.open = true;
+                        console.log("接收记录详情", response.data.data);
+                        this.form.acceptMessage = response.data.data.str;
+                        queryTheEntrustmentDetailsByEntrustmentNumber(row.taskId).then(response => {
+                            if (response.data.code === 1) {
+                                this.form.task = response.data.data.task;
+                                this.form.usersInfo = response.data.data.usersInfo;
+                                this.form.usersInfo.userRole = this.identity[this.form.usersInfo.userRole];
+                                this.form.task.type = this.taskType[`${this.form.task.type}`];
+                                this.operation = this.operations[`${row.status}`];
+                                this.form.id = row.id;
+                                console.log("委托接收记录详情", this.form);
+                                this.open = true;
+                            } else {
+                                this.$message(
+                                    {
+                                        message: response.data.msg,
+                                        type: 'error'
+                                    }
+                                )
+                            }
+                        });
                     } else {
                         this.$message(
                             {
@@ -290,8 +325,10 @@
                                 type: 'error'
                             }
                         )
+                        return;
                     }
-                });
+                })
+
 
             },
             handleSizeChange(val) {
@@ -319,6 +356,12 @@
                 this[actionName]()
                 // this[actionName]() 或者 this.$emit(actionName)
                 // 具体实现取决于您的项目需求和上下文
+            },
+            /** 取消接收 */
+            cancelAcceptor() {
+                const acceptRecordId = this.form.id;
+                console.log("委托接收记录id", acceptRecordId)
+                executeConfirmedRequest(cancelAcceptorByAcceptor, acceptRecordId, "确认取消接受委托", "确认取消接受委托", "取消委托成功", "取消接受委托失败", "取消接受委托失败", "取消接受委托取消")
             },
             /** 提交留言 */
             acceptsTheEntrustment() {

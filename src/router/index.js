@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import Event from '../views/Event.vue'
 import Main from '../views/Main.vue'
 import pageOne from '../views/PageOne.vue'
 import pageTwo from '../views/PageTwo.vue'
@@ -23,6 +22,9 @@ import SystemBulletinList from '@/views/admin/SystemBulletinList.vue'
 import SystemNoticeList from '@/views/admin/SystemNoticeList.vue'
 import DelegationType from '@/views/admin/DelegationType.vue'
 import ViewOnGoingList from '@/views/user/ViewOnGoingList.vue'
+import MyDelegationAcceptList from '@/views/user/MyDelegationAcceptList.vue'
+import MyDelegationPublishList from '@/views/user/MyDelegationPublishList.vue'
+import ExpireDelegationList from '@/views/admin/ExpireDelegationList.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -61,7 +63,11 @@ const routes = [
             { path: '/systemBulletinList', name: 'systemBulletinList', component: SystemBulletinList },
             { path: '/systemNoticeList', name: 'systemNoticeList', component: SystemNoticeList },
             { path: '/delegationType', name: 'delegationType', component: DelegationType },
-            { path: '/viewOnGoingList', name: 'viewOnGoingList', component: ViewOnGoingList }
+            { path: '/viewOnGoingList', name: 'viewOnGoingList', component: ViewOnGoingList },
+            { path: '/myDelegationPublishList', name: 'myDelegationPublishList', component: MyDelegationPublishList },
+            { path: '/myDelegationAcceptList', name: 'myDelegationAcceptList', component: MyDelegationAcceptList },
+            { path: '/expireDelegationList', name: 'expireDelegationList', component: ExpireDelegationList }
+
         ]
     },
     // 默认页面

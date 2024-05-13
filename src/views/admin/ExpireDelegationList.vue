@@ -155,13 +155,13 @@
                 taskType: {
                 },
                 operations: {
-                    "委托发布中": {
+                    "已过期": {
                         index: 0,
                         title: ["撤销发布", "退为草稿"],
                         type: ["warning", "warn"],
                         click: ["withdrawReleaseAdmin", "fallbackDraftAdmin"]
                     },
-                    "已接受": {
+                    "已接收": {
                         index: 1,
                         title: ["删除记录"],
                         type: ["warning"],
@@ -182,7 +182,7 @@
             /** 查询存储委托信息记录列表 */
             getList() {
                 this.loading = true;
-                this.queryParams.TypePhase = "PUBLISHING_AND_EXECUTION";
+                this.queryParams.TypePhase = "LIFECYCLE_TERMINATION";
                 listDelegateRecords(this.queryParams).then((response) => {
                     console.log("查询委托信息记录列表", response);
                     this.delegateRecordsList = response.data.data.records.map((record) => {
@@ -289,8 +289,9 @@
                     console.log("查看委托选项", this.operation);
                     this.open = true;
                     this.title = "查看委托信息";
+                    this.open = true;
                 });
-                this.open = true;
+
             },
             /** 引导按钮操作 */
             handleButtonClick(actionName) {

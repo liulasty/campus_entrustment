@@ -3,7 +3,7 @@
         :collapse="isCollapse" background-color="#545c64" text-color="#fff" activeIndex="activeIndex"
         active-text-color="#ffd04b">
         <h3>{{ isCollapse ? '委托' : '校园委托平台' }}</h3>
-        <el-menu-item @click="clickMenu(item)" v-for="item in noChildren" :key="item.name" :index="item.index">
+        <el-menu-item @click="clickMenu(item)" v-for="item in noChildren" :key="item.index" :index="item.index">
             <i :class="`el-icon-${item.icon}`"></i>
             <span slot="title">{{ item.label }}</span>
         </el-menu-item>
@@ -87,12 +87,27 @@
                         index: '3'
                     },
                     {
-                        path: '/athlete',
-                        name: 'athlete',
                         label: '我的委托',
                         icon: 's-custom',
-                        url: 'athleteMange/athleteMange',
-                        index: '4'
+                        index: '4',
+                        children: [
+                            {
+                                path: '/myDelegationPublishList',
+                                name: 'myDelegationPublishList',
+                                label: '我的发布',
+                                icon: 'setting',
+                                url: 'Other/PageOne',
+                                index: '4-1'
+                            },
+                            {
+                                path: '/myDelegationAcceptList',
+                                name: 'myDelegationAcceptList',
+                                label: '我的接收',
+                                icon: 'setting',
+                                url: 'Other/PageTwo',
+                                index: '4-2'
+                            }
+                        ]
                     },
                     {
                         path: '/myInfo',
@@ -100,7 +115,8 @@
                         label: '个人信息',
                         icon: 's-custom',
                         url: 'eventItemMange/eventItemMange',
-                        index: '5'
+                        index: '5',
+
                     },
                     {
                         path: '/athleteApplication',
@@ -203,7 +219,8 @@
                         },
                         {
                             label: '委托管理',
-                            icon: 'location', index: '3',
+                            icon: 'location',
+                            index: '3',
                             children: [
                                 {
                                     path: '/draftList',
@@ -222,11 +239,11 @@
                                     index: '3-2'
                                 },
                                 {
-                                    path: '/publishedList',
-                                    name: 'publishedList',
+                                    path: '/expireDelegationList',
+                                    name: 'expireDelegationList',
                                     label: '未完成委托',
                                     icon: 'setting',
-                                    url: 'delegation/publishedList',
+                                    url: 'delegation/ExpireDelegationList',
                                     index: '3-3'
                                 },
                                 {

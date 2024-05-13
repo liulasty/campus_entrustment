@@ -10,6 +10,9 @@
                 <el-select v-model="queryParams.status" clearable>
                     <el-option label="委托发布中" value="ONGOING" />
                     <el-option label="委托已完成" value="ACCEPTED" />
+                    <el-option label="委托已过期" value="EXPIRED" />
+                    <el-option label="委托已取消" value="CANCELLED" />
+
                 </el-select>
             </el-form-item>
             <el-form-item label="委托类型" prop="taskType" class="input-reader-name">
@@ -38,7 +41,6 @@
 
 
         <el-table v-loading="loading" :data="viewOnGoingList" :row-style="{ height: '50px' }">
-            <el-table-column label="委托发布者ID" align="center" prop="ownerId" />
             <el-table-column label="委托类型" align="center" prop="type" />
             <el-table-column label="委托描述" align="center" prop="description" show-overflow-tooltip />
             <el-table-column label="委托发布时间" align="center" prop="startTime" />
@@ -54,44 +56,82 @@
         </el-table>
 
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-            :current-page=queryParams.pageNum :page-sizes="[5, 7, 10, 15]" :page-size=queryParams.pageSize
+            :current-page=queryParams.pageNum :page-sizes="[3, 5, 7, 10]" :page-size=queryParams.pageSize
             layout="total, sizes, prev, pager, next, jumper" :total="total" />
 
-        <!-- 添加或修改存储委托信息审核记录对话框 -->
-        <el-dialog :title="title" :visible.sync="open" width="550px" append-to-body>
-            <el-form ref="form" :model="form" label-width="110px">
-                <el-form-item label="发布者信息" prop="usersInfo">
-                    <el-form-item label="发布者名字" prop="name">
-                        {{form.usersInfo.name}}
-                    </el-form-item>
-                    <el-form-item label="发布者QQ" prop="qqNumber">
-                        {{form.usersInfo.qqNumber}}
-                    </el-form-item>
-                    <el-form-item label="发布者电话" prop="phoneNumber">
-                        {{form.usersInfo.phoneNumber}}
-                    </el-form-item>
-                    <el-form-item label="发布者身份" prop="userRole">
-                        {{form.usersInfo.userRole}}
-                    </el-form-item>
-                </el-form-item>
-                <el-form-item label="委托内容" prop="task">
-                    <el-form-item label="委托任务内容" prop="name">
-                        {{form.task.description}}
-                    </el-form-item>
-                    <el-form-item label="委托任务地点" prop="qqNumber">
-                        {{form.task.location}}
-                    </el-form-item>
-                    <el-form-item label="委托类型" prop="phoneNumber">
-                        {{form.task.type}}
-                    </el-form-item>
-                    <el-form-item label="委托截止时间" prop="userRole">
-                        {{form.task.endTime}}
-                    </el-form-item>
-                </el-form-item>
-                <el-form-item label="留言" prop="delegationStr">
-                    <el-input type="textarea" v-model="delegationStr" size="large" rows="4" maxlength="80"></el-input>
-                </el-form-item>
-            </el-form>
+        <!-- 处理接收委托信息审核框 -->
+        <el-dialog :title="title" :visible.sync="open" width="750px">
+            <div>
+
+            </div>
+            <el-descriptions class="margin-top" title="委托内容" :column="3" border>
+                <el-descriptions-item>
+                    <template slot="label">
+                        <i class="el-icon-user"></i>
+                        委托任务内容
+                    </template>
+                    {{form.task.description}}
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template slot="label">
+                        <i class="el-icon-mobile-phone"></i>
+                        委托任务地点
+                    </template>
+                    {{form.task.location}}
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template slot="label">
+                        <i class="el-icon-location-outline"></i>
+                        委托类型
+                    </template>
+                    {{form.task.type}}
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template slot="label">
+                        <i class="el-icon-tickets"></i>
+                        委托发布时间
+                    </template>
+                    <el-tag size="small">{{form.task.startTime}}</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template slot="label">
+                        <i class="el-icon-office-building"></i>
+                        委托截止时间
+                    </template>
+                    <el-tag size="small">{{form.task.endTime}}</el-tag>
+                </el-descriptions-item>
+            </el-descriptions>
+            <el-card class="box-card" style="margin-top: 10px;">
+                <div style="height: 250px;">
+                    <ul class="infinite-list" style="height: 250px;overflow:auto;margin-bottom: 15px; ">
+                        <li v-for="record in form.taskAcceptRecords" class="infinite-list-item">
+                            <el-descriptions :column="6" direction="vertical" border>
+                                <el-descriptions-item label="用户" labelStyle="width: 100px">
+                                    {{record.userName}}
+                                </el-descriptions-item>
+
+                                <el-descriptions-item label="身份" labelStyle="width: 100px">
+                                    <el-tag size="small">{{record.userType}}</el-tag>
+                                </el-descriptions-item>
+                                <el-descriptions-item label="留言" labelStyle="width: 150px">
+                                    {{record.taskAcceptRecords.str}}</el-tag>
+                                </el-descriptions-item>
+                                <el-descriptions-item label="接收时间" labelStyle="width: 200px"
+                                    :contentStyle="{'text-align': 'left'}">
+                                    {{ record.taskAcceptRecords.acceptTime}}
+                                </el-descriptions-item>
+                                <el-descriptions-item label="操作" labelStyle="width: 100px"
+                                    :contentStyle="{'text-align': 'left'}">
+                                    <el-button type="primary" size="small"
+                                        @click="handleAccept(record.taskAcceptRecords.id)">采取</el-button>
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </li>
+                    </ul>
+                </div>
+            </el-card>
+
+
             <div slot="footer" class="dialog-footer">
                 <div v-if="Array.isArray(operation.title)">
                     <!-- 多个按钮的情况 -->
@@ -111,11 +151,14 @@
 </template>
 <script>
     import { getTaskCategories } from '@/api/'
-    import { listViewOnGoingList, queryTheEntrustmentDetailsByEntrustmentNumber, acceptCommission } from '@/api/user.js'
+    import { publishDelegationList, queryTheEntrustmentDetailsByEntrustmentNumber, confirmTheRecipient } from '@/api/user.js'
     import { executeConfirmedRequest } from '@/utils/globalConfirmAction.js'
     export default {
         data() {
             return {
+                //委托描述
+                descriptions: "",
+                count: 0,
                 // 遮罩层
                 loading: true,
                 //委托留言
@@ -127,13 +170,13 @@
                 // 存储委托记录表格数据
                 viewOnGoingList: [],
                 // 弹出层标题
-                title: "委托详情",
+                title: "",
                 // 是否显示弹出层
                 open: false,
                 // 查询参数
                 queryParams: {
                     pageNum: 1,
-                    pageSize: 10,
+                    pageSize: 5,
                 },
                 // 地点类型数组
                 locationType: [
@@ -173,15 +216,21 @@
                 operations: {
                     "委托发布中": {
                         index: 0,
-                        title: ["接受委托", "取消"],
-                        type: ["success", "info"],
-                        click: ["acceptsTheEntrustment", "cancel"]
+                        title: ["取消发布"],
+                        type: ["warning"],
+                        click: ["cancelPublish"]
                     },
                     "已接受": {
                         index: 1,
                         title: ["觉得很赞", "觉得很差"],
                         type: ["success", "warning"],
-                        click: ["increaseGood", "increaseBad"]
+                        click: ["increaseGood", "decreaseGood"]
+                    },
+                    "已过期": {
+                        index: 2,
+                        title: ["回退为草稿", "删除该委托"],
+                        type: ["info", "warning"],
+                        click: ["fallbackDraftByPublisher", "deleteDelegation"]
                     }
                 },
                 operation: {},
@@ -248,7 +297,7 @@
             },
             getList() {
                 this.loading = true;
-                listViewOnGoingList(this.queryParams).then(response => {
+                publishDelegationList(this.queryParams).then(response => {
                     if (response.data.code == 1) {
                         this.viewOnGoingList = response.data.data.records.map((record) => {
 
@@ -258,7 +307,7 @@
                         });
 
 
-                        this.total = response.total;
+                        this.total = response.data.data.total;
                         this.loading = false;
 
                     } else {
@@ -280,8 +329,7 @@
                         console.log(this.form);
                         this.form.usersInfo.userRole = this.identity[this.form.usersInfo.userRole];
                         this.form.task.type = this.taskType[`${this.form.task.type}`];
-                        console.log("form", this.form.task.status);
-                        this.operation = this.operations[`${this.form.task.status}`];
+                        this.operation = this.operations[`${this.form.task.status}`]
                         this.open = true;
                     } else {
                         this.$message(
@@ -320,33 +368,33 @@
                 // this[actionName]() 或者 this.$emit(actionName)
                 // 具体实现取决于您的项目需求和上下文
             },
-            /** 提交留言 */
-            acceptsTheEntrustment() {
-                const data = {
-                    task: this.form.task.taskId,
-                    str: this.delegationStr,
-                    user: this.$store.state.userInfo.userId
-                }
-                console.log("提交留言", this.delegationStr);
-                if (this.delegationStr === "") {
-                    this.$message(
-                        {
-                            message: "请留下你所提供的信息",
-                            type: 'error'
-                        }
-                    )
-                    return;
-                }
-                executeConfirmedRequest(acceptCommission, data, "确认接受委托", "确认接受委托", "接受委托成功,等待委托发布者处理", "接受委托失败", "接受委托失败", "接受委托取消");
+            handleAccept(id) {
+                executeConfirmedRequest(confirmTheRecipient, id, "是否将此委托托付给该接收者", "确认接受委托者", "确认成功,等待接收者完成委托任务", "确认失败");
                 this.getList();
                 this.open = false;
+            },
+            increaseGood() {
+                executeConfirmedRequest(increaseGood, this.form.task.taskId, "是否确认增加积分", "确认增加积分", "确认成功,积分已增加", "确认失败");
+            },
+            decreaseGood() {
+                executeConfirmedRequest(decreaseGood, this.form.task.taskId, "是否确认减少积分", "确认减少积分", "确认成功,积分已减少", "确认失败");
+            },
+            cancelPublish() {
+                executeConfirmedRequest(cancelPublish, this.form.task.taskId, "是否确认取消发布", "确认取消发布", "确认成功,取消发布成功", "确认失败");
+            },
+            fallbackDraftByPublisher() {
+                executeConfirmedRequest(fallbackDraftByPublisher, this.form.task.taskId, "是否确认撤回", "确认撤回", "确认成功,撤回成功", "确认失败");
+            },
+            deleteDelegation() {
+                executeConfirmedRequest(deleteDelegation, this.form.task.taskId, "是否确认删除", "确认删除", "确认成功,删除成功", "确认失败");
             }
+
         }
 
-
     }
+
 </script>
-<style scoped>
+<style lang="css" scoped>
     .el-input {
         width: 180px;
     }
@@ -354,4 +402,16 @@
     .el-select {
         width: 130px;
     }
+
+    .my-label {
+        background: #E1F3D8;
+    }
+
+    .my-content {
+        background: #FDE2E2;
+    }
+
+    /* .el-dialog__body {
+        padding: 10px 30px;
+    } */
 </style>
