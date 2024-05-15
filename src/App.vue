@@ -15,21 +15,25 @@
 <script>
 
 
-export default {
-  name: 'App',
-  data() {
-    return {
-           
-        }
-  }
+  export default {
+    name: 'App',
+    data() {
+      return {
 
-}
+      }
+    }
+
+  }
 </script>
 
 <style lang="less">
-  html,body{
+  html,
+  body {
     margin: 0;
     padding: 0;
   }
 
+  .el-scrollbar {
+    padding-left: 10px;
+  }
 </style>

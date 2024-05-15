@@ -1,24 +1,38 @@
 <template>
     <div>
         <el-row :gutter="20">
-            <el-card class="box-card" body-style="margin: 20px 20px;">
+            <el-card class="box-card" body-style="margin: 10px 10px;">
                 主要内容包括：{{ description }}
             </el-card>
         </el-row>
         <el-row :gutter="20" style="margin-top: 20px;">
             <el-col :span="12">
                 <el-card class="box-card">
+
                     <h6>
                         <i class="el-icon-s-promotion"></i>
-                        <span>流程定义</span>
+                        <span>发布委托信息流程：先创建草稿，再申请发布委托，只有通过审核后，再发布委托。</span>
                     </h6>
                     <h6>
                         <i class="el-icon-s-promotion"></i>
-                        <span>流程定义</span>
+                        <span>草稿创建后可以修改，发布后不可修改。</span>
                     </h6>
                     <h6>
                         <i class="el-icon-s-promotion"></i>
-                        <span>流程定义</span>
+                        <span>内容合法合规：所有发布的信息必须符合国家法律法规和学校相关规定，不得含有违法、淫秽、暴力、歧视等不良内容。</span>
+                    </h6>
+                    <h6>
+                        <i class="el-icon-s-promotion"></i>
+                        <span>真实准确：发布的信息必须真实准确，不得故意虚假宣传、夸大事实或误导他人。</span>
+                    </h6>
+                    <h6>
+                        <i class="el-icon-s-promotion"></i>
+                        <span>尊重隐私：严禁发布他人隐私信息，包括但不限于手机号码、学号、家庭住址等个人敏感信息。</span>
+                    </h6>
+                    <h6>
+                        <i class="el-icon-s-promotion"></i>
+                        <span>适度宣传：允许校园内部组织、社团、团队等发布相关活动、招募信息，但不得进行过度商业宣传。</span>
+
                     </h6>
                 </el-card>
                 <el-form ref="form" :model="DelegationFrom" label-width="100px" size="mini">
@@ -27,7 +41,7 @@
                             maxlength="80"></el-input>
                     </el-form-item>
                     <el-form-item label="委托地点">
-                        <el-select v-model="DelegationFrom.location" placeholder="请选择委托地点">
+                        <el-select v-model="DelegationFrom.location" placeholder="请选择委托地点" style="padding: 5px;">
                             <el-option v-for="item in options" :key="item.value" :label="item.label"
                                 :value="item.value">
                             </el-option>
@@ -173,314 +187,333 @@
 </template>
 <script>
 
-import {
-    addTaskDraft, updateTaskDraft, getDraftDetailsBasedOnCommissionId, deleteTaskDraft, submitTaskDraft,
-    confirmTask, getReason, publishingDelegation
-} from "@/api/index"
+    import {
+        addTaskDraft, updateTaskDraft, getDraftDetailsBasedOnCommissionId, deleteTaskDraft, submitTaskDraft,
+        confirmTask, getReason, publishingDelegation
+    } from "@/api/index"
 
-export default {
-    props: {
+    import { executeConfirmedRequest } from '@/utils/globalConfirmAction'
 
-        DelegationType: {
-            type: String,
-            default: 'abc'
+    export default {
+        props: {
+
+            DelegationType: {
+                type: String,
+                default: 'abc'
+            },
+            id: {
+                type: Number,
+                default: 1
+            },
+            description: {
+                type: String,
+                default: 'abc'
+            },
+            tasks: {
+                type: Array,
+                required: true
+            },
+            taskTypeOption: {
+                type: Array,
+                required: false,
+                default() {
+                    return [{
+                        label: "校园带去",
+                        value: 1
+                    }, {
+                        label: "校园代买",
+                        value: 2
+                    }]
+                }
+            },
+
         },
-        id: {
-            type: Number,
-            default: 1
-        },
-        description: {
-            type: String,
-            default: 'abc'
-        },
-        tasks: {
-            type: Array,
-            required: true
-        },
-        taskTypeOption: {
-            type: Array,
-            required: false,
-            default() {
-                return [{
-                    label: "校园带去",
-                    value: 1
+        data() {
+            return {
+                dialogVisibleEdit: false,
+                dialogVisibleReason: false,
+                dialogVisiblePublish: false,
+                DelegationFrom: {
+                    content: '',
+                    location: ''
+                },
+                publishFrom: {
+
+                },
+                DraftFrom: {
+                    taskId: 0,
+                    location: "教学楼",
+                    description: "教学事故研究会",
+                    type: 1,
+                    createdAt: "2024-04-13 09:41:25"
+                },
+                taskType: [],
+
+                showTypeColumn: false,
+                tableData: [{
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
                 }, {
-                    label: "校园代买",
-                    value: 2
-                }]
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1517 弄'
+                }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1519 弄'
+                }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1516 弄'
+                }],
+                options: [
+                    {
+                        value: '教学楼',
+                        label: '教学楼'
+                    },
+                    {
+                        value: '图书馆',
+                        label: '图书馆'
+                    },
+                    {
+                        value: '食堂',
+                        label: '食堂'
+                    },
+                    {
+                        value: '运动场',
+                        label: '运动场'
+                    },
+                    {
+                        value: '实验室',
+                        label: '实验室'
+                    },
+                    {
+                        value: '其他',
+                        label: '其他'
+                    },
+                ],
+                reason: {
+                    name: "",
+                    reviewStatus: "",
+                    reviewComment: "",
+                    reviewTime: "",
+                }
             }
         },
+        methods: {
+            //添加草稿
+            async onSubmit() {
+                this.DelegationFrom.type = this.DelegationType;
+                this.DelegationFrom.ownerId = this.$store.state.userInfo.userId;
+                console.log("提交委托草稿", this.DelegationFrom)
 
-    },
-    data() {
-        return {
-            dialogVisibleEdit: false,
-            dialogVisibleReason: false,
-            dialogVisiblePublish: false,
-            DelegationFrom: {
-                content: '',
-                location: ''
-            },
-            publishFrom: {
-
-            },
-            DraftFrom: {
-                taskId: 0,
-                location: "教学楼",
-                description: "教学事故研究会",
-                type: 1,
-                createdAt: "2024-04-13 09:41:25"
-            },
-            taskType: [],
-
-            showTypeColumn: false,
-            tableData: [{
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1517 弄'
-            }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1519 弄'
-            }, {
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1516 弄'
-            }],
-            options: [
-                {
-                    value: '教学楼',
-                    label: '教学楼'
-                },
-                {
-                    value: '图书馆',
-                    label: '图书馆'
-                },
-                {
-                    value: '食堂',
-                    label: '食堂'
-                },
-                {
-                    value: '运动场',
-                    label: '运动场'
-                },
-                {
-                    value: '实验室',
-                    label: '实验室'
-                },
-                {
-                    value: '其他',
-                    label: '其他'
-                },
-            ],
-            reason: {
-                name: "",
-                reviewStatus: "",
-                reviewComment: "",
-                reviewTime: "",
-            }
-        }
-    },
-    methods: {
-        //添加草稿
-        onSubmit() {
-            console.log('submit!');
-            this.DelegationFrom.type = this.DelegationType;
-            this.DelegationFrom.ownerId = this.$store.state.userInfo.userId;
-            console.log("提交委托草稿", this.DelegationFrom)
-
-            addTaskDraft(this.DelegationFrom).then((data) => {
-                console.log(data.data)
+                executeConfirmedRequest(
+                    addTaskDraft,
+                    this.DelegationFrom,
+                    "确认添加该委托信息？",
+                    "提示信息",
+                    "确认添加",
+                    "添加成功",
+                    "添加失败",
+                    "取消添加草稿"
+                )
                 this.refresh()
 
-            })
+                // addTaskDraft(this.DelegationFrom).then((data) => {
+                //     console.log(data.data)
+                //     this.refresh()
+
+                // })
 
 
-        },
-        //重置表单
-        resetForm(formName) {
-            this.$refs[formName].resetFields();
-        },
-        //更新草稿
-        handleEdit(row) {
-            console.log(row.taskId);
-            // console.log("类型数组", this.taskTypeOption)
+            },
+            //重置表单
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            //更新草稿
+            handleEdit(row) {
+                console.log(row.taskId);
+                // console.log("类型数组", this.taskTypeOption)
 
-            getDraftDetailsBasedOnCommissionId(row.taskId).then((data) => {
-                console.log(data.data);
-                this.DraftFrom = data.data.data
-                this.dialogVisibleEdit = true;
-            })
-        },
-        //刷新委托列表
-        refresh() {
-            this.$emit('childEvent');
-        },
-        //提交修改
-        committingChanges() {
-            console.log("修改的内容", this.DraftFrom);
-            updateTaskDraft(this.DraftFrom).then((data) => {
-                console.log(data);
-                if (data.data.code === 1) {
-                    this.$message({
-                        message: data.data.msg,
-                        type: 'success'
-                    });
-                    this.dialogVisibleEdit = false;
-                    this.refresh()
-                }
-            })
-
-        },
-        //删除草稿
-        handleDelete(row) {
-            console.log(row);
-            //确认删除
-            this.$confirm('确认删除？', '确认信息', {
-                distinguishCancelAndClose: true,
-                confirmButtonText: '确认',
-                cancelButtonText: '放弃删除'
-            })
-                .then(() => {
-                    deleteTaskDraft(row.taskId).then((data) => {
-                        if (data.data.code === 1) {
-                            this.$message({
-                                message: data.data.msg,
-                                type: 'success'
-                            });
-                            this.refresh()
-                        }
-                    })
+                getDraftDetailsBasedOnCommissionId(row.taskId).then((data) => {
+                    console.log(data.data);
+                    this.DraftFrom = data.data.data
+                    this.dialogVisibleEdit = true;
                 })
-                .catch(action => {
-                    this.$message({
-                        type: 'info',
-                        message: action === 'cancel'
-                            ? '取消删除'
-                            : '停留在当前页面'
+            },
+            //刷新委托列表
+            refresh() {
+                this.$emit('childEvent');
+            },
+            //提交修改
+            committingChanges() {
+                console.log("修改的内容", this.DraftFrom);
+                updateTaskDraft(this.DraftFrom).then((data) => {
+                    console.log(data);
+                    if (data.data.code === 1) {
+                        this.$message({
+                            message: data.data.msg,
+                            type: 'success'
+                        });
+                        this.dialogVisibleEdit = false;
+                        this.refresh()
+                    }
+                })
+
+            },
+            //删除草稿
+            handleDelete(row) {
+                console.log(row);
+                //确认删除
+                this.$confirm('确认删除？', '确认信息', {
+                    distinguishCancelAndClose: true,
+                    confirmButtonText: '确认',
+                    cancelButtonText: '放弃删除'
+                })
+                    .then(() => {
+                        deleteTaskDraft(row.taskId).then((data) => {
+                            if (data.data.code === 1) {
+                                this.$message({
+                                    message: data.data.msg,
+                                    type: 'success'
+                                });
+                                this.refresh()
+                            }
+                        })
                     })
-                });
+                    .catch(action => {
+                        this.$message({
+                            type: 'info',
+                            message: action === 'cancel'
+                                ? '取消删除'
+                                : '停留在当前页面'
+                        })
+                    });
 
-        },
-        //提交草稿审核
-        handleOngoing(data) {
-            //去审核
-            submitTaskDraft(data.taskId).then((data) => {
-                console.log("去审核", data);
-                if (data.data.code === 1) {
-                    this.$message({
-                        type: 'success',
-                        message: data.data.msg
-                    });
-                } else {
-                    this.$message({
-                        type: 'error',
-                        message: data.data.msg
-                    });
+            },
+            //提交草稿审核
+            handleOngoing(data) {
+                //去审核
+                submitTaskDraft(data.taskId).then((data) => {
+                    console.log("去审核", data);
+                    if (data.data.code === 1) {
+                        this.$message({
+                            type: 'success',
+                            message: data.data.msg
+                        });
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: data.data.msg
+                        });
+                    }
+                    this.$emit('childEvent');
                 }
-                this.$emit('childEvent');
-            }
-            )
+                )
 
-        },
-        //打开确认发布窗口
-        handleAudit(data) {
-            this.dialogVisiblePublish = true;
-            confirmTask(data.taskId).then(data => {
-                if (data.data.code == 1) {
-                    this.$message({
-                        type: 'success',
-                        message: data.data.msg
-                    });
-                    this.publishFrom = data.data.data;
-                    console.log(this.taskTypeOption);
-                    this.publishFrom.type = this.taskTypeOption[this.publishFrom.type - 1].label;
-                } else {
+            },
+            //打开确认发布窗口
+            handleAudit(data) {
+                this.dialogVisiblePublish = true;
+                confirmTask(data.taskId).then(data => {
+                    if (data.data.code == 1) {
+                        this.$message({
+                            type: 'success',
+                            message: data.data.msg
+                        });
+                        this.publishFrom = data.data.data;
+                        console.log(this.taskTypeOption);
+                        this.publishFrom.type = this.taskTypeOption[this.publishFrom.type - 1].label;
+                    } else {
+                        this.dialogVisiblePublish = false;
+                        this.$message({
+                            type: 'error',
+                            message: data.data.msg
+                        });
+
+                    }
+                })
+            },
+            //发布委托
+            publishDelegation() {
+                console.log("即将发布的委托", this.publishFrom);
+                const publish = {
+                    id: this.publishFrom.taskId,
+                    start: this.publishFrom.startTime,
+                    end: this.publishFrom.endTime
+                }
+                publishingDelegation(publish).then((data) => {
+                    if (data.data.code === 1) {
+                        this.$message({
+                            message: data.data.msg,
+                            type: 'success'
+                        });
+
+                    } else {
+                        this.$message({
+                            message: data.data.msg,
+                            type: 'error'
+                        });
+                    }
+                    this.$emit('childEvent');
                     this.dialogVisiblePublish = false;
-                    this.$message({
-                        type: 'error',
-                        message: data.data.msg
-                    });
+                })
+            },
 
-                }
-            })
-        },
-        //发布委托
-        publishDelegation() {
-            console.log("即将发布的委托", this.publishFrom);
-            const publish = {
-                id: this.publishFrom.taskId,
-                start: this.publishFrom.startTime,
-                end: this.publishFrom.endTime
+
+
+
+            //查看审核未通过原因
+            handleDetail(val) {
+                getReason(val.taskId).then((data) => {
+                    if (data.data.code == 1) {
+                        this.reason = data.data.data;
+                        console.log("查看审核未通过原因", this.reason);
+                        this.dialogVisibleReason = true;
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: data.data.msg
+                        });
+                    }
+                })
+            },
+            cancel(form) {
+                this.resetForm(form);
             }
-            publishingDelegation(publish).then((data) => {
-                if (data.data.code === 1) {
-                    this.$message({
-                        message: data.data.msg,
-                        type: 'success'
-                    });
 
-                } else {
-                    this.$message({
-                        message: data.data.msg,
-                        type: 'error'
-                    });
-                }
-                this.$emit('childEvent');
-                this.dialogVisiblePublish = false;
-            })
         },
+        mounted() {
 
-
-
-
-        //查看审核未通过原因
-        handleDetail(val) {
-            getReason(val.taskId).then((data) => {
-                if (data.data.code == 1) {
-                    this.reason = data.data.data;
-                    console.log("查看审核未通过原因", this.reason);
-                    this.dialogVisibleReason = true;
-                } else {
-                    this.$message({
-                        type: 'error',
-                        message: data.data.msg
-                    });
-                }
-            })
-        },
-        cancel(form) {
-            this.resetForm(form);
         }
-
-    },
-    mounted() {
-
     }
-}
 </script>
 <style scoped>
-* {
-    margin: 0;
-    padding: 0;
-}
+    * {
+        margin: 0;
+        padding: 0;
+    }
 
-button {
-    height: 35px;
-    width: 100px;
-}
+    button {
+        height: 35px;
+        width: 100px;
+    }
 
-.el-form-item--mini.el-form-item,
-.el-form-item--small.el-form-item {
-    margin-bottom: 20px;
-    margin-top: 20px;
-}
+    .el-form-item--mini.el-form-item,
+    .el-form-item--small.el-form-item {
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
 
-.el-driver {
-    margin: 34px 0px;
-}
+    .el-driver {
+        margin: 34px 0px;
+    }
+
+    h6 {
+        font-size: 15px;
+        font-weight: 300;
+        margin-bottom: 5px;
+    }
 </style>

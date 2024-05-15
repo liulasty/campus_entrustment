@@ -55,3 +55,7 @@ export const getPersonalNoticeList = (data) => {
 export const getNoticeById = (id) => {
     return http.get('/notifications/info/' + id)
 }
+
+export const cancelPublishUser = (id) => {
+    return http.put('/user/publisher/cancel/' + id)
+}

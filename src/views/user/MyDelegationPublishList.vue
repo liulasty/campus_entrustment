@@ -102,7 +102,7 @@
                 </el-descriptions-item>
             </el-descriptions>
             <el-card class="box-card" style="margin-top: 10px;">
-                <div style="height: 250px;">
+                <div style="height: 250px;" v-if="!getDelegationAcceptListLength">
                     <ul class="infinite-list" style="height: 250px;overflow:auto;margin-bottom: 15px; ">
                         <li v-for="record in form.taskAcceptRecords" class="infinite-list-item">
                             <el-descriptions :column="6" direction="vertical" border>
@@ -129,6 +129,9 @@
                         </li>
                     </ul>
                 </div>
+                <div style="height: 250px;" v-if="getDelegationAcceptListLength">
+                    <loadingVue text="该为委托目前无人接收"></loadingVue>
+                </div>
             </el-card>
 
 
@@ -151,10 +154,18 @@
 </template>
 <script>
     import { getTaskCategories } from '@/api/'
-    import { publishDelegationList, queryTheEntrustmentDetailsByEntrustmentNumber, confirmTheRecipient } from '@/api/user.js'
+    import {
+        publishDelegationList, queryTheEntrustmentDetailsByEntrustmentNumber, confirmTheRecipient,
+        cancelPublishUser
+    } from '@/api/user.js'
     import { executeConfirmedRequest } from '@/utils/globalConfirmAction.js'
+    import loadingVue from '@/components/Loading.vue'
     export default {
+        components: {
+            loadingVue
+        },
         data() {
+
             return {
                 //委托描述
                 descriptions: "",
@@ -231,7 +242,13 @@
                         title: ["回退为草稿", "删除该委托"],
                         type: ["info", "warning"],
                         click: ["fallbackDraftByPublisher", "deleteDelegation"]
-                    }
+                    },
+                    "已取消": {
+                        index: 3,
+                        title: ["回退为草稿", "删除该委托"],
+                        type: ["info", "warning"],
+                        click: ["fallbackDraftByPublisher", "deleteDelegation"]
+                    },
                 },
                 operation: {},
                 //身份信息
@@ -247,7 +264,8 @@
                     usersInfo: {
                         name: "",
                     },
-                    task: {}
+                    task: {},
+                    taskAcceptRecords: []
                 },
             };
         },
@@ -326,10 +344,11 @@
                     if (response.data.code === 1) {
 
                         this.form = response.data.data;
-                        console.log(this.form);
+                        console.log("发布委托信息", this.form);
                         this.form.usersInfo.userRole = this.identity[this.form.usersInfo.userRole];
                         this.form.task.type = this.taskType[`${this.form.task.type}`];
                         this.operation = this.operations[`${this.form.task.status}`]
+                        this.getDelegationAcceptListLength()
                         this.open = true;
                     } else {
                         this.$message(
@@ -341,6 +360,10 @@
                     }
                 });
 
+            },
+            getDelegationAcceptListLength() {
+                console.log("该委托接收记录数", this.form.taskAcceptRecords.length, this.form.taskAcceptRecords.length === 0);
+                return this.form.taskAcceptRecords.length === 0;
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -387,6 +410,9 @@
             },
             deleteDelegation() {
                 executeConfirmedRequest(deleteDelegation, this.form.task.taskId, "是否确认删除", "确认删除", "确认成功,删除成功", "确认失败");
+            },
+            cancelPublish() {
+                executeConfirmedRequest(cancelPublishUser, this.form.task.taskId, "是否确认取消发布", "确认取消发布", "确认成功,取消发布成功", "确认失败");
             }
 
         }

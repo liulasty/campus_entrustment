@@ -3,22 +3,22 @@
         <el-row>
             <el-tabs @tab-click="handleClick">
                 <el-tab-pane v-for="notice in noticeType" :key="notice.value" :label="notice.label">
-                    <el-col :span="12">
-                        <el-card class="box-card" body-style="height: 400px;">
+                    <el-col>
+                        <el-card class="box-card" body-style="height: 400px; width: 100%">
                             <el-table :data="tableData" style="width: 100%">
-                                <el-table-column prop="date" label="日期" width="180">
+                                <el-table-column prop="date" label="日期">
                                 </el-table-column>
-                                <el-table-column prop="title" label="主题" width="100">
+                                <el-table-column prop="title" label="主题">
                                 </el-table-column>
                                 <el-table-column prop="isRead" label="是否已读">
                                     <template slot-scope="scope">
-                                        <el-tag v-if="scope.row.isRead == 0" type="success">未读</el-tag>
-                                        <el-tag v-else type="danger">已读</el-tag>
+                                        <el-tag size="medium" v-if="scope.row.isRead == 0" type="success">未读</el-tag>
+                                        <el-tag size="medium" v-else type="danger">已读</el-tag>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="content" label="操作" width="100">
+                                <el-table-column prop="content" label="操作">
                                     <template slot-scope="scope">
-                                        <el-button type="text" @click="handleView(scope.row.id)">查看</el-button>
+                                        <el-button type="primary" @click="handleView(scope.row.id)">查看</el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -26,33 +26,41 @@
                         </el-card>
 
                     </el-col>
-                    <el-col :span="12">
 
-                        <el-card class="box-card" body-style="height: 400px;">
-                            <div class="header">
-                                <h1 class="title">{{ notice.title }}</h1>
 
-                            </div>
 
-                            <div class="announcement-list">
-                                <!-- 示例公告卡片 -->
-                                <div class="announcement-card">
-                                    <p>{{ notice.description }}</p>
-                                </div>
-                                <!-- 更多公告卡片可按需添加 -->
-                            </div>
 
-                            <footer>
-                                <p>发送时间: {{ notice.date }}</p>
-                                <p>&copy; 2023 Your Company. All rights reserved.</p>
-                            </footer>
 
-                        </el-card>
-                    </el-col>
+
                 </el-tab-pane>
             </el-tabs>
 
         </el-row>
+        <el-dialog width="30%" title="通知详情" :visible.sync="innerVisible" append-to-body>
+            <el-card class="box-card notice-card">
+                <div class="header">
+                    <h1 class="title">{{ notice.title }}</h1>
+
+                </div>
+
+                <div class="announcement-list">
+                    <!-- 示例公告卡片 -->
+                    <div class="announcement-card">
+                        <p>{{ notice.description }}</p>
+                    </div>
+                    <!-- 更多公告卡片可按需添加 -->
+                </div>
+
+                <footer class="fixed-footer">
+                    <div class="notice-footer announcement-card">
+                        <p>发送时间: {{ notice.date }}</p>
+                        <p>&copy; SNUT 2024年 All rights reserved Liu Yu.</p>
+                    </div>
+
+                </footer>
+
+            </el-card>
+        </el-dialog>
     </div>
 
 </template>
@@ -143,12 +151,14 @@
                     title: "个人信息通知",
                     description: "个人信息通知",
                     date: "2023-04-01",
+                    show: false
                 },
+                innerVisible: false
             }
         },
         methods: {
             handleClick(tab, event) {
-                console.log(tab, event);
+                // console.log(tab, event);
                 this.tableData = [];
                 switch (tab.label) {
                     case "个人信息通知":
@@ -158,7 +168,7 @@
                         this.getTaskInformationNotification();
                         break;
                     case "营销信息通知":
-                        this.getMarketingInformationNotification();
+                        this.getMarketInformationNotification();
                         break;
                     case "系统信息通知":
                         this.getSystemInformationNotification();
@@ -226,7 +236,7 @@
                     console.log(data);
                     if (data.data.code == 1) {
                         this.notice = data.data.data;
-                        console.log(this.notice);
+                        this.innerVisible = true;
                     } else {
                         this.$message({
                             message: data.data.msg,
@@ -243,11 +253,13 @@
 
             cancel(form) {
                 this.resetForm(form);
-            }
+            },
 
         },
         mounted() {
+
             this.getPersonalInformationNotification(this.userId);
+
         }
     }
 </script>
@@ -272,9 +284,10 @@
     }
 
     .header {
-        background-color: #f1f1f1;
+        background-color: #94c3f9;
         padding: 20px;
         text-align: center;
+        border-radius: 10px;
     }
 
     .title {
@@ -288,13 +301,18 @@
 
     .announcement-list {
         display: grid;
+        /* 将元素设置为网格布局 */
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        /* 自动适配网格列数，每列最小宽度300px，占据可用空间的1/1 */
         gap: 20px;
+        /* 设置网格元素之间的间距 */
         padding: 20px;
+        /* 设置网格外部的边距 */
+        line-height: 8;
     }
 
     .announcement-card {
-        border: 1px solid #ddd;
+        border: 1px solid #b3c5fa;
         padding: 10px;
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -306,5 +324,26 @@
 
     .card-date {
         color: #999;
+    }
+
+    .notice-card {
+        border: 1px solid #7cb6f4;
+        height: 400px;
+        margin-left: 5px;
+    }
+
+    .el-tag {
+        margin-right: 5px;
+        width: 50px;
+        text-align: center;
+    }
+
+    .el-button--primary {
+        width: 100px;
+        line-height: 2;
+    }
+
+    .notice-footer {
+        margin-top: 20px;
     }
 </style>
