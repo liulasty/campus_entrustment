@@ -306,9 +306,9 @@
             async onSubmit() {
                 this.DelegationFrom.type = this.DelegationType;
                 this.DelegationFrom.ownerId = this.$store.state.userInfo.userId;
-                console.log("提交委托草稿", this.DelegationFrom)
+                // console.log("提交委托草稿", this.DelegationFrom)
 
-                executeConfirmedRequest(
+                await executeConfirmedRequest(
                     addTaskDraft,
                     this.DelegationFrom,
                     "确认添加该委托信息？",
@@ -319,13 +319,6 @@
                     "取消添加草稿"
                 )
                 this.refresh()
-
-                // addTaskDraft(this.DelegationFrom).then((data) => {
-                //     console.log(data.data)
-                //     this.refresh()
-
-                // })
-
 
             },
             //重置表单

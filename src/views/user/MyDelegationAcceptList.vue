@@ -38,6 +38,7 @@
 
 
         <el-table v-loading="loading" :data="viewOnGoingList" :row-style="{ height: '50px' }">
+            <el-table-column label="委托接收记录编号" align="center" prop="id" />
             <el-table-column label="委托类型" align="center" prop="type" />
             <el-table-column label="委托描述" align="center" prop="description" show-overflow-tooltip />
             <el-table-column label="委托留言时间" align="center" prop="acceptTime" />
@@ -279,7 +280,7 @@
                         });
                         console.log("列表数据", this.viewOnGoingList);
 
-                        this.total = response.total;
+                        this.total = response.data.data.total;
                         this.loading = false;
 
                     } else {

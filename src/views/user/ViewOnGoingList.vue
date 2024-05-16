@@ -58,40 +58,112 @@
             layout="total, sizes, prev, pager, next, jumper" :total="total" />
 
         <!-- 添加或修改存储委托信息审核记录对话框 -->
-        <el-dialog :title="title" :visible.sync="open" width="550px" append-to-body>
-            <el-form ref="form" :model="form" label-width="110px">
-                <el-form-item label="发布者信息" prop="usersInfo">
-                    <el-form-item label="发布者名字" prop="name">
-                        {{form.usersInfo.name}}
-                    </el-form-item>
-                    <el-form-item label="发布者QQ" prop="qqNumber">
-                        {{form.usersInfo.qqNumber}}
-                    </el-form-item>
-                    <el-form-item label="发布者电话" prop="phoneNumber">
-                        {{form.usersInfo.phoneNumber}}
-                    </el-form-item>
-                    <el-form-item label="发布者身份" prop="userRole">
-                        {{form.usersInfo.userRole}}
-                    </el-form-item>
-                </el-form-item>
-                <el-form-item label="委托内容" prop="task">
-                    <el-form-item label="委托任务内容" prop="name">
-                        {{form.task.description}}
-                    </el-form-item>
-                    <el-form-item label="委托任务地点" prop="qqNumber">
-                        {{form.task.location}}
-                    </el-form-item>
-                    <el-form-item label="委托类型" prop="phoneNumber">
-                        {{form.task.type}}
-                    </el-form-item>
-                    <el-form-item label="委托截止时间" prop="userRole">
-                        {{form.task.endTime}}
-                    </el-form-item>
-                </el-form-item>
-                <el-form-item label="留言" prop="delegationStr">
-                    <el-input type="textarea" v-model="delegationStr" size="large" rows="4" maxlength="80"></el-input>
-                </el-form-item>
-            </el-form>
+        <el-dialog :title="title" :visible.sync="open" width="850px" top="10px" append-to-body>
+            <el-row>
+                <el-col :span="12">
+                    <el-card class="box-card Info-card">
+                        <el-form ref="form" :model="form" label-width="110px">
+
+                            <el-form-item label="发布者名字" prop="name">
+                                {{form.usersInfo.name}}
+                            </el-form-item>
+                            <el-form-item label="发布者QQ" prop="qqNumber">
+                                {{form.usersInfo.qqNumber}}
+                            </el-form-item>
+                            <el-form-item label="发布者电话" prop="phoneNumber">
+                                {{form.usersInfo.phoneNumber}}
+                            </el-form-item>
+                            <el-form-item label="发布者身份" prop="userRole">
+                                {{form.usersInfo.userRole}}
+                            </el-form-item>
+                            <el-form-item label="委托任务内容" prop="name">
+                                {{form.task.description}}
+                            </el-form-item>
+                            <el-form-item label="委托任务地点" prop="qqNumber">
+                                {{form.task.location}}
+                            </el-form-item>
+                            <el-form-item label="委托类型" prop="phoneNumber">
+                                {{form.task.type}}
+                            </el-form-item>
+                            <el-form-item label="委托截止时间" prop="userRole">
+                                {{form.task.endTime}}
+                            </el-form-item>
+
+
+                        </el-form>
+
+                    </el-card>
+
+
+                </el-col>
+                <el-col :span="12">
+                    <el-card class="box-card publisher-card">
+                        <div slot="header" class="clearfix">
+                            <span>该委托发布者发布情况</span>
+
+                            <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
+                        </div>
+                        <el-row :gutter="20">
+                            <el-col :span="10" class="el-statistic-wrapper">
+                                <div>
+                                    <el-statistic :value="form.taskPublishedTotal" title="当前已发布委托数">
+                                    </el-statistic>
+                                </div>
+                            </el-col>
+                            <el-col :span="10" class="el-statistic-wrapper">
+                                <div>
+                                    <el-statistic :value="form.taskAcceptedTotal" title="发布委托已完成数">
+                                    </el-statistic>
+                                </div>
+                            </el-col>
+
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="10" class="el-statistic-wrapper">
+                                <div>
+                                    <el-statistic :value="form.taskCanceledTotal" title="已取消发布委托数">
+                                    </el-statistic>
+                                </div>
+                            </el-col>
+                            <el-col :span="10" class="el-statistic-wrapper">
+                                <div>
+                                    <el-statistic :value="form.taskOverdueTotal" title="已过期发布委托数">
+                                    </el-statistic>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+                    <div v-show="form.task.status=='已完成'">
+                        <el-rate v-model="taskRateValue" disabled show-score text-color="#ff9900"
+                            score-template="{value}">
+                        </el-rate>
+
+                        <!-- <el-rate v-model="value2" :colors="colors">
+                        </el-rate> -->
+                    </div>
+                    <div v-show="form.task.status=='委托发布中'">
+                        <div v-if="!isPublisher(form.task)">
+                            <div v-show="form.taskAcceptRecords === null">
+                                <el-input type="textarea" v-model="delegationStr" placeholder="请输入你的接收委托留言信息"
+                                    size="large" rows="6" maxlength="180">
+                                </el-input>
+                            </div>
+                            <div v-show="form.taskAcceptRecords !== null">
+                                <el-tag type="info">请在我的委托-我的接收里查看详情</el-tag>
+
+                            </div>
+                        </div>
+                        <div v-if="isPublisher(form.task)">
+                            <el-tag type="info">请在我的委托-我的发布里查看详情</el-tag>
+                        </div>
+
+
+
+                    </div>
+
+                </el-col>
+            </el-row>
+
             <div slot="footer" class="dialog-footer">
                 <div v-if="Array.isArray(operation.title)">
                     <!-- 多个按钮的情况 -->
@@ -111,7 +183,7 @@
 </template>
 <script>
     import { getTaskCategories } from '@/api/'
-    import { listViewOnGoingList, queryTheEntrustmentDetailsByEntrustmentNumber, acceptCommission } from '@/api/user.js'
+    import { listViewOnGoingList, getTaskAndPublishUserInfoByTaskId, acceptCommission } from '@/api/user.js'
     import { executeConfirmedRequest } from '@/utils/globalConfirmAction.js'
     export default {
         data() {
@@ -177,11 +249,17 @@
                         type: ["success", "info"],
                         click: ["acceptsTheEntrustment", "cancel"]
                     },
-                    "已接受": {
+                    "已完成": {
                         index: 1,
-                        title: ["觉得很赞", "觉得很差"],
+                        title: ["觉得该委托发布的很赞", "觉得该委托发布的很差"],
                         type: ["success", "warning"],
                         click: ["increaseGood", "increaseBad"]
+                    },
+                    "已接收": {
+                        index: 2,
+                        title: [],
+                        type: [],
+                        click: []
                     }
                 },
                 operation: {},
@@ -200,6 +278,13 @@
                     },
                     task: {}
                 },
+                // 发布者已发布信息统计
+                publishedValue: 0,
+                colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
+                // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
+                taskRateValue: 5,
+
+
             };
         },
         created() {
@@ -211,6 +296,14 @@
             this.handleQuery();
         },
         methods: {
+            /*判断当前用户是否是发布者 */
+            isPublisher(task) {
+                if (task.publisherId === this.$store.state.userInfo.userId) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
             /** 获取委托类型操作 */
             handleType() {
                 //获取类型
@@ -258,7 +351,7 @@
                         });
 
 
-                        this.total = response.total;
+                        this.total = response.data.data.total;
                         this.loading = false;
 
                     } else {
@@ -273,14 +366,14 @@
             },
             handleView(row) {
                 console.log(row);
-                queryTheEntrustmentDetailsByEntrustmentNumber(row.taskId).then(response => {
+                getTaskAndPublishUserInfoByTaskId(row.taskId).then(response => {
                     if (response.data.code === 1) {
 
                         this.form = response.data.data;
                         console.log(this.form);
                         this.form.usersInfo.userRole = this.identity[this.form.usersInfo.userRole];
                         this.form.task.type = this.taskType[`${this.form.task.type}`];
-                        console.log("form", this.form.task.status);
+                        // console.log("form", this.form.task.status);
                         this.operation = this.operations[`${this.form.task.status}`];
                         this.open = true;
                     } else {
@@ -337,8 +430,11 @@
                     )
                     return;
                 }
-                executeConfirmedRequest(acceptCommission, data, "确认接受委托", "确认接受委托", "接受委托成功,等待委托发布者处理", "接受委托失败", "接受委托失败", "接受委托取消");
+                executeConfirmedRequest(acceptCommission, data, "我确认接受委托", "是否确认接受委托", "接受委托成功,等待委托发布者处理", "接受委托失败", "接受委托失败", "接受委托取消");
                 this.getList();
+                this.open = false;
+            },
+            cancel() {
                 this.open = false;
             }
         }
@@ -353,5 +449,27 @@
 
     .el-select {
         width: 130px;
+    }
+
+    .publisher-card {
+
+        height: 300px;
+        margin-bottom: 10px;
+    }
+
+    .Info-card {
+        margin-right: 10px;
+    }
+
+    .like {
+        cursor: pointer;
+        font-size: 25px;
+        display: inline-block;
+    }
+
+    .el-statistic-wrapper {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        margin-left: 20px;
     }
 </style>

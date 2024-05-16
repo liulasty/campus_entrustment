@@ -60,7 +60,7 @@
             layout="total, sizes, prev, pager, next, jumper" :total="total" />
 
         <!-- 处理接收委托信息审核框 -->
-        <el-dialog :title="title" :visible.sync="open" width="750px">
+        <el-dialog :title="title" :visible.sync="open" top="10px" width="750px">
             <div>
 
             </div>
@@ -101,14 +101,19 @@
                     <el-tag size="small">{{form.task.endTime}}</el-tag>
                 </el-descriptions-item>
             </el-descriptions>
-            <el-card class="box-card" style="margin-top: 10px;">
-                <div style="height: 250px;" v-if="!getDelegationAcceptListLength">
+            <el-card v-show="form.task.status === '委托发布中'" class="box-card" style="margin-top: 10px;">
+                <div style="height: 250px;" v-show="form.taskAcceptRecordsStatus">
+                    <div slot="header" class="clearfix" style="margin-bottom: 5px;">
+                        <span>该委托接收情况</span>
+                        <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
+                    </div>
                     <ul class="infinite-list" style="height: 250px;overflow:auto;margin-bottom: 15px; ">
                         <li v-for="record in form.taskAcceptRecords" class="infinite-list-item">
                             <el-descriptions :column="6" direction="vertical" border>
                                 <el-descriptions-item label="用户" labelStyle="width: 100px">
                                     {{record.userName}}
                                 </el-descriptions-item>
+
 
                                 <el-descriptions-item label="身份" labelStyle="width: 100px">
                                     <el-tag size="small">{{record.userType}}</el-tag>
@@ -120,6 +125,12 @@
                                     :contentStyle="{'text-align': 'left'}">
                                     {{ record.taskAcceptRecords.acceptTime}}
                                 </el-descriptions-item>
+                                <el-descriptions-item label="留言者完成委托情况" labelStyle="width: 100px">
+                                    <el-tooltip class="item" effect="dark" :content="record.entrustedCompletionStatus"
+                                        placement="top">
+                                        <el-button type="info">查看</el-button>
+                                    </el-tooltip>
+                                </el-descriptions-item>
                                 <el-descriptions-item label="操作" labelStyle="width: 100px"
                                     :contentStyle="{'text-align': 'left'}">
                                     <el-button type="primary" size="small"
@@ -129,11 +140,32 @@
                         </li>
                     </ul>
                 </div>
-                <div style="height: 250px;" v-if="getDelegationAcceptListLength">
+                <div style="height: 250px;" v-show="!form.taskAcceptRecordsStatus">
                     <loadingVue text="该为委托目前无人接收"></loadingVue>
                 </div>
             </el-card>
+            <el-card v-show="form.task.status === '已接收'" class="box-card" style="margin-top: 10px;">
 
+                <div slot="header" class="clearfix" style="margin-bottom: 5px;">
+                    <el-rate v-model="taskRateValue" show-text text-color="#ff9900">
+                    </el-rate>
+                    <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6}" placeholder="请输入完成委托评价"
+                        v-model="completeTheEntrustedEvaluation">
+                    </el-input>
+                </div>
+
+            </el-card>
+            <el-card v-show="form.task.status === '已完成'" class="box-card" style="margin-top: 10px;">
+
+                <div slot="header" class="clearfix" style="margin-bottom: 5px;">
+                    <el-rate v-model="taskRateValue" show-text text-color="#ff9900">
+                    </el-rate>
+                    <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6}" placeholder="请输入完成委托评价"
+                        v-model="completeTheEntrustedEvaluation">
+                    </el-input>
+                </div>
+
+            </el-card>
 
             <div slot="footer" class="dialog-footer">
                 <div v-if="Array.isArray(operation.title)">
@@ -156,7 +188,7 @@
     import { getTaskCategories } from '@/api/'
     import {
         publishDelegationList, queryTheEntrustmentDetailsByEntrustmentNumber, confirmTheRecipient,
-        cancelPublishUser
+        cancelPublishUser, updateDelegationCompleted
     } from '@/api/user.js'
     import { executeConfirmedRequest } from '@/utils/globalConfirmAction.js'
     import loadingVue from '@/components/Loading.vue'
@@ -231,11 +263,11 @@
                         type: ["warning"],
                         click: ["cancelPublish"]
                     },
-                    "已接受": {
+                    "已接收": {
                         index: 1,
-                        title: ["觉得很赞", "觉得很差"],
+                        title: ["确认完成", "该委托未完成"],
                         type: ["success", "warning"],
-                        click: ["increaseGood", "decreaseGood"]
+                        click: ["confirmTheRecipientDelegation", "cancelTheRecipientDelegation"]
                     },
                     "已过期": {
                         index: 2,
@@ -248,6 +280,18 @@
                         title: ["回退为草稿", "删除该委托"],
                         type: ["info", "warning"],
                         click: ["fallbackDraftByPublisher", "deleteDelegation"]
+                    },
+                    "已完成": {
+                        index: 4,
+                        title: ["删除该委托"],
+                        type: ["warning"],
+                        click: ["deleteDelegation"]
+                    },
+                    "未完成": {
+                        index: 5,
+                        title: ["删除该委托"],
+                        type: ["warning"],
+                        click: ["deleteDelegation"]
                     },
                 },
                 operation: {},
@@ -267,6 +311,12 @@
                     task: {},
                     taskAcceptRecords: []
                 },
+
+                taskRateValue: 1,
+                completeTheEntrustedEvaluation: "",
+
+
+
             };
         },
         created() {
@@ -340,15 +390,26 @@
             },
             handleView(row) {
                 console.log(row);
+                this.form = {
+                    usersInfo: {
+                        name: "",
+                    },
+                    task: {},
+                    taskAcceptRecords: []
+                }
                 queryTheEntrustmentDetailsByEntrustmentNumber(row.taskId).then(response => {
                     if (response.data.code === 1) {
 
                         this.form = response.data.data;
-                        console.log("发布委托信息", this.form);
+
                         this.form.usersInfo.userRole = this.identity[this.form.usersInfo.userRole];
                         this.form.task.type = this.taskType[`${this.form.task.type}`];
+                        this.form.taskAcceptRecords.forEach(element => {
+                            element.entrustedCompletionStatus = "已完成委托次数: " + element.taskAccomplishCount + ", 委托完成评分: " + element.taskAccomplishGrade;
+                        });
                         this.operation = this.operations[`${this.form.task.status}`]
-                        this.getDelegationAcceptListLength()
+                        console.log("已发布的委托信息", this.form);
+                        this.getDelegationAcceptListLength();
                         this.open = true;
                     } else {
                         this.$message(
@@ -362,8 +423,14 @@
 
             },
             getDelegationAcceptListLength() {
-                console.log("该委托接收记录数", this.form.taskAcceptRecords.length, this.form.taskAcceptRecords.length === 0);
-                return this.form.taskAcceptRecords.length === 0;
+
+                if (this.form.taskAcceptRecords.length <= 0) {
+
+                    this.form.taskAcceptRecordsStatus = false;
+                } else {
+                    console.log("该委托接收记录数", this.form.taskAcceptRecords.length, this.form.taskAcceptRecords.length === 0);
+                    this.form.taskAcceptRecordsStatus = true;
+                }
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -413,6 +480,22 @@
             },
             cancelPublish() {
                 executeConfirmedRequest(cancelPublishUser, this.form.task.taskId, "是否确认取消发布", "确认取消发布", "确认成功,取消发布成功", "确认失败");
+            },
+            confirmTheRecipientDelegation() {
+                console.log("确认该委托已完成", this.form.task.taskId, this.completeTheEntrustedEvaluation, this.taskRateValue);
+                if (this.completeTheEntrustedEvaluation && this.taskRateValue) {
+                    const data = {
+                        taskId: this.form.task.taskId,
+                        taskAccomplishGrade: this.taskRateValue,
+                        taskAccomplishReview: this.completeTheEntrustedEvaluation
+                    }
+                    executeConfirmedRequest(updateDelegationCompleted, data, "是否确认该委托已完成", "确认该委托已完成", "确认完成，已提交完成信息", "确认失败");
+                } else {
+                    this.$message({
+                        message: "请填写委托完成评价和评分",
+                        type: 'error'
+                    })
+                }
             }
 
         }

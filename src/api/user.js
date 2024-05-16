@@ -13,6 +13,10 @@ export const getTaskCategoriesUser = () => {
 
 
 export const queryTheEntrustmentDetailsByEntrustmentNumber = (id) => {
+    return http.get('/user/publisher/getTask/' + id)
+}
+
+export const getTaskAndPublishUserInfoByTaskId = (id) => {
     return http.get('/user/task/' + id)
 }
 
@@ -58,4 +62,8 @@ export const getNoticeById = (id) => {
 
 export const cancelPublishUser = (id) => {
     return http.put('/user/publisher/cancel/' + id)
+}
+
+export const updateDelegationCompleted = (data) => {
+    return http.put('/user/publisher/completed/' + data.taskId, data)
 }

@@ -27,6 +27,13 @@
             </el-form-item>
         </el-form>
         <div>
+            <el-row class="table-btn-group">
+                <el-col :span="24" class="table-btn-group-right">
+                    <el-button type="primary" class="add-btn" size="small" @click="addDialogSystemBulletin"
+                        round>添加系统公告</el-button>
+
+                </el-col>
+            </el-row>
             <el-row class="table-container">
                 <el-col>
                     <el-table :data="list" border style="width: 100%">
@@ -72,6 +79,7 @@
                     </el-pagination>
                 </el-col>
             </el-row>
+
         </div>
         <div>
             <el-dialog title="更改系统公告" :visible.sync="open" width="700px" append-to-body>
@@ -317,6 +325,9 @@
                     }
                 });
             },
+            addDialogSystemBulletin() {
+
+            }
         }
     }
 
