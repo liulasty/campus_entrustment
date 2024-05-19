@@ -9,7 +9,8 @@
             <el-form-item label="委托状态" prop="status" class="input-reader-name">
                 <el-select v-model="queryParams.status" clearable>
                     <el-option label="委托发布中" value="ONGOING" />
-                    <el-option label="委托已完成" value="ACCEPTED" />
+                    <el-option label="委托已接收" value="ACCEPTED" />
+                    <el-option label="委托已完成" value="COMPLETED" />
                 </el-select>
             </el-form-item>
             <el-form-item label="委托类型" prop="taskType" class="input-reader-name">

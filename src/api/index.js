@@ -170,8 +170,8 @@ export function updateDelegateauditrecords(data) {
 }
 
 // 删除存储委托信息审核记录
-export function delDelegateauditrecords(RecordID) {
-    return http.delete('/delegateauditrecords/' + RecordID)
+export const delDelegateUpdateRecords = (RecordID) => {
+    return http.delete('/taskUpdate/' + RecordID)
 }
 
 
@@ -331,6 +331,11 @@ export const deleteDelegationType = (id) => {
 export const enableDelegationType = (id) => {
     console.log("更改委托委托类型", id);
     return http.put('/delegation_categories/enable/' + id)
+}
+
+export const withdrawReleaseByTaskIDAdmin = (id) => {
+    console.log("管理员撤回发布", id);
+    return http.put('/admin/task/withdrawReleaseByTaskID/' + id)
 }
 
 export const uploadAvatar = (file) => {

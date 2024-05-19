@@ -32,7 +32,6 @@
 
         <el-table v-loading="loading" :data="delegateRecordsList" @selection-change="handleSelectionChange"
             :row-style="{ height: '50px' }">
-            <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="委托任务ID" align="center" prop="taskId" />
             <el-table-column label="委托发布者ID" align="center" prop="ownerId" />
             <el-table-column label="委托内容" align="center" prop="description" show-overflow-tooltip />
@@ -88,336 +87,325 @@
 </template>
 
 <script>
-import { listDelegateRecords, delDelegate, getDelegateByTaskID, addDelegateauditrecords, updateDelegateauditrecords, getTaskCategories, FallbackDraft, allowPublish, notAllowed } from "@/api/";
+    import { listDelegateRecords, delDelegate, getDelegateByTaskID, addDelegateauditrecords, updateDelegateauditrecords, getTaskCategories, FallbackDraft, allowPublish, notAllowed } from "@/api/";
 
-import { executeConfirmedRequest } from '@/utils/globalConfirmAction'
+    import { executeConfirmedRequest } from '@/utils/globalConfirmAction'
 
-export default {
-    name: "Delegateauditrecords",
-    data() {
-        return {
-            // 遮罩层
-            loading: true,
-            // 选中数组
-            ids: [],
-            // 非单个禁用
-            single: true,
-            // 非多个禁用
-            multiple: true,
-            // 显示搜索条件
-            showSearch: true,
-            // 总条数
-            total: 0,
-            // 存储委托信息审核记录表格数据
-            delegateRecordsList: [],
-            // 弹出层标题
-            title: "",
-            // 是否显示弹出层
-            open: false,
-            // 查询参数
-            queryParams: {
-                pageNum: 1,
-                pageSize: 10,
-            },
-            // 地点类型数组
-            locationType: [
-                {
-                    value: '教学楼',
-                    label: '教学楼'
+    export default {
+        name: "Delegateauditrecords",
+        data() {
+            return {
+                // 遮罩层
+                loading: true,
+                // 选中数组
+                ids: [],
+                // 非单个禁用
+                single: true,
+                // 非多个禁用
+                multiple: true,
+                // 显示搜索条件
+                showSearch: true,
+                // 总条数
+                total: 0,
+                // 存储委托信息审核记录表格数据
+                delegateRecordsList: [],
+                // 弹出层标题
+                title: "",
+                // 是否显示弹出层
+                open: false,
+                // 查询参数
+                queryParams: {
+                    pageNum: 1,
+                    pageSize: 10,
                 },
-                {
-                    value: '图书馆',
-                    label: '图书馆'
+                // 地点类型数组
+                locationType: [
+                    {
+                        value: '教学楼',
+                        label: '教学楼'
+                    },
+                    {
+                        value: '图书馆',
+                        label: '图书馆'
+                    },
+                    {
+                        value: '食堂',
+                        label: '食堂'
+                    },
+                    {
+                        value: '运动场',
+                        label: '运动场'
+                    },
+                    {
+                        value: '实验室',
+                        label: '实验室'
+                    },
+                    {
+                        value: '其他',
+                        label: '其他'
+                    },
+                ],
+                //委托类型
+                taskTypeOption: [
+                    { label: "委托", value: 1 },
+                    { label: "取消委托", value: 2 }
+                ],
+                //委托类型
+                taskType: {
                 },
-                {
-                    value: '食堂',
-                    label: '食堂'
-                },
-                {
-                    value: '运动场',
-                    label: '运动场'
-                },
-                {
-                    value: '实验室',
-                    label: '实验室'
-                },
-                {
-                    value: '其他',
-                    label: '其他'
-                },
-            ],
-            //委托类型
-            taskTypeOption: [
-                { label: "委托", value: 1 },
-                { label: "取消委托", value: 2 }
-            ],
-            //委托类型
-            taskType: {
-            },
-            //相对应操作
-            operations: {
-                "草稿": {
-                    index: 0,
-                    title: "删除",
-                    type: "danger",
-                    click: "delete"
-                },
-                "审核中": {
-                    index: 1,
-                    title: ["允许发布", "不允许发布"],
-                    type: ["primary", "danger"],
-                    click: ["allowPublish", "notAllowed"]
-                },
-                "审核未通过": {
-                    index: 2,
-                    title: ["退为草稿", "删除此委托"],
-                    type: ["primary", "danger"],
-                    click: ["Fallback", "delete"]
-                },
-                "等待发布": {
-                    index: 3,
-                    title: ["退为草稿", "删除此委托"],
-                    type: ["primary", "danger"],
-                    click: ["Fallback", "delete"]
-                },
+                //相对应操作
+                operations: {
+                    "草稿": {
+                        index: 0,
+                        title: "删除",
+                        type: "danger",
+                        click: "delete"
+                    },
+                    "审核中": {
+                        index: 1,
+                        title: ["允许发布", "不允许发布"],
+                        type: ["primary", "danger"],
+                        click: ["allowPublish", "notAllowed"]
+                    },
+                    "审核未通过": {
+                        index: 2,
+                        title: ["退为草稿", "删除此委托"],
+                        type: ["primary", "danger"],
+                        click: ["Fallback", "delete"]
+                    },
+                    "等待发布": {
+                        index: 3,
+                        title: ["退为草稿", "删除此委托"],
+                        type: ["primary", "danger"],
+                        click: ["Fallback", "delete"]
+                    },
 
 
-            },
-            operation: {},
-            // 表单参数
-            form: {},
-        };
-    },
-    created() {
-        this.handleType();
-        this.getList();
-
-    },
-    methods: {
-        /** 查询存储委托信息记录列表 */
-        getList() {
-            this.loading = true;
-            this.queryParams.TypePhase = "EDITING_AND_AUDITING";
-            listDelegateRecords(this.queryParams).then((response) => {
-                console.log("查询委托信息记录列表", response);
-                this.delegateRecordsList = response.data.data.records.map((record) => {
-
-                    record.type = this.taskType[`${record.type}`]; // 确保类型安全
-
-                    return record;
-                });
-                console.log(this.delegateRecordsList);
-                this.total = response.data.data.total;
-                this.loading = false;
-            });
-        },
-        getTaskValue(value) {
-            return this.taskType[value];
-        },
-        /** 获取委托类型操作 */
-        handleType() {
-            //获取类型
-            getTaskCategories().then((data) => {
-                this.taskTypeOption = [];
-                if (data.data.code === 1) {
-
-                    if (data.data.data.length > 0) {
-
-                        const taskCategories = data.data.data;
-
-                        for (let i = 0; i < taskCategories.length; i++) {
-                            //生成键值对
-                            this.taskType[`${taskCategories[i].id}`] = `${taskCategories[i].name}`
-                            this.taskTypeOption.push({ label: taskCategories[i].name, value: taskCategories[i].id })
-                        }
-                        // console.log("类型信息", this.tabPanes);
-                        console.log(this.taskType);
-                        // console.log("类型数组", this.taskTypeOption);
-                    }
-                }
-            })
-        },
-        // 取消按钮
-        cancel() {
-            this.open = false;
-            this.reset();
-        },
-        // 表单重置
-        reset() {
-            this.form = {
-                RecordID: null,
-                DelegateID: null,
-                UserID: null,
-                ReviewStatus: null,
-                ReviewComment: null,
-                ReviewTime: null
+                },
+                operation: {},
+                // 表单参数
+                form: {},
             };
-            this.resetForm("form");
         },
-        /** 搜索按钮操作 */
-        handleQuery() {
-            this.queryParams.pageNum = 1;
-
-            console.log("搜索参数：", this.queryParams);
+        created() {
+            this.handleType();
             this.getList();
-        },
-        /** 重置按钮操作 */
-        resetQuery() {
-            this.resetForm("queryForm");
-            this.handleQuery();
-        },
-        // 多选框选中数据
-        handleSelectionChange(selection) {
-            this.ids = selection.map(item => item.RecordID)
-            this.single = selection.length !== 1
-            this.multiple = !selection.length
-        },
 
-        /** 提交按钮 */
-        submitForm() {
-            this.$refs["form"].validate(valid => {
-                if (valid) {
-                    if (this.form.RecordID != null) {
-                        updateDelegateauditrecords(this.form).then(response => {
-                            this.$modal.msgSuccess("修改成功");
-                            this.open = false;
-                            this.getList();
-                        });
-                    } else {
-                        addDelegateauditrecords(this.form).then(response => {
-                            this.$modal.msgSuccess("新增成功");
-                            this.open = false;
-                            this.getList();
-                        });
+        },
+        methods: {
+            /** 查询存储委托信息记录列表 */
+            getList() {
+                this.loading = true;
+                this.queryParams.TypePhase = "EDITING_AND_AUDITING";
+                listDelegateRecords(this.queryParams).then((response) => {
+                    console.log("查询委托信息记录列表", response);
+                    this.delegateRecordsList = response.data.data.records.map((record) => {
+
+                        record.type = this.taskType[`${record.type}`]; // 确保类型安全
+
+                        return record;
+                    });
+                    console.log(this.delegateRecordsList);
+                    this.total = response.data.data.total;
+                    this.loading = false;
+                });
+            },
+            getTaskValue(value) {
+                return this.taskType[value];
+            },
+            /** 获取委托类型操作 */
+            handleType() {
+                //获取类型
+                getTaskCategories().then((data) => {
+                    this.taskTypeOption = [];
+                    if (data.data.code === 1) {
+
+                        if (data.data.data.length > 0) {
+
+                            const taskCategories = data.data.data;
+
+                            for (let i = 0; i < taskCategories.length; i++) {
+                                //生成键值对
+                                this.taskType[`${taskCategories[i].id}`] = `${taskCategories[i].name}`
+                                this.taskTypeOption.push({ label: taskCategories[i].name, value: taskCategories[i].id })
+                            }
+                            // console.log("类型信息", this.tabPanes);
+                            console.log(this.taskType);
+                            // console.log("类型数组", this.taskTypeOption);
+                        }
                     }
+                })
+            },
+            // 取消按钮
+            cancel() {
+                this.open = false;
+                this.reset();
+            },
+            // 表单重置
+            reset() {
+                this.form = {
+                    RecordID: null,
+                    DelegateID: null,
+                    UserID: null,
+                    ReviewStatus: null,
+                    ReviewComment: null,
+                    ReviewTime: null
+                };
+                this.resetForm("form");
+            },
+            /** 搜索按钮操作 */
+            handleQuery() {
+                this.queryParams.pageNum = 1;
+
+                console.log("搜索参数：", this.queryParams);
+                this.getList();
+            },
+            /** 重置按钮操作 */
+            resetQuery() {
+                this.resetForm("queryForm");
+                this.handleQuery();
+            },
+            // 多选框选中数据
+            handleSelectionChange(selection) {
+                this.ids = selection.map(item => item.RecordID)
+                this.single = selection.length !== 1
+                this.multiple = !selection.length
+            },
+
+            /** 提交按钮 */
+            submitForm() {
+                this.$refs["form"].validate(valid => {
+                    if (valid) {
+                        if (this.form.RecordID != null) {
+                            updateDelegateauditrecords(this.form).then(response => {
+                                this.$modal.msgSuccess("修改成功");
+                                this.open = false;
+                                this.getList();
+                            });
+                        } else {
+                            addDelegateauditrecords(this.form).then(response => {
+                                this.$modal.msgSuccess("新增成功");
+                                this.open = false;
+                                this.getList();
+                            });
+                        }
+                    }
+                });
+            },
+            /** 查看按钮操作 */
+            handleView(id) {
+
+                getDelegateByTaskID(id).then(response => {
+                    console.log("查看委托信息", response.data.data);
+                    this.form = response.data.data;
+                    this.operation = this.operations[response.data.data.status];
+                    console.log("查看委托选项", this.operation);
+                    this.open = true;
+                    this.title = "查看委托信息";
+                });
+            },
+            /** 引导按钮操作 */
+            handleButtonClick(actionName) {
+                console.log("点击按钮", actionName);
+                // 在这里实现点击按钮时调用的逻辑，例如：
+                this[actionName]()
+                // this[actionName]() 或者 this.$emit(actionName)
+                // 具体实现取决于您的项目需求和上下文
+            },
+            /**删除 */
+            async delete() {
+                const id = this.form.taskId;
+                console.log("删除委托", id);
+                await executeConfirmedRequest(delDelegate, id, "是否确认删除该委托草稿？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
+                this.open = false;
+                this.getList();
+            },
+            /**退为草稿 */
+            async Fallback() {
+                const id = this.form.taskId;
+                console.log("退为草稿", id);
+                await executeConfirmedRequest(FallbackDraft, id, "是否确认退为草稿？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
+                this.open = false;
+                this.getList();
+                // this.$confirm('是否确认退为草稿?', "警告", {
+                //     confirmButtonText: "确定",
+                //     cancelButtonText: "取消",
+                //     type: "warning"
+                // }).then(function () {
+                //     return FallbackDraft(id);
+                // }.then(() => {
+                //     this.getList();
+                //     this.$modal.msgSuccess("退为草稿成功");
+                //     this.$refs["form"].reset();
+                // }).catch(function () { }))
+            },
+            /**允许发布 */
+            async allowPublish() {
+                const id = this.form.taskId;
+                console.log("允许发布", id);
+                await executeConfirmedRequest(allowPublish, id, "是否确认允许发布？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
+                this.open = false;
+                this.getList();
+                // this.$confirm('是否确认允许发布?', "警告", {
+                //     confirmButtonText: "确定",
+                //     cancelButtonText: "取消",
+                //     type: "warning"
+                // }).then(function () {
+                //     return allowPublish(id);
+                // }.then(() => {
+                //     this.getList();
+                //     this.$modal.msgSuccess("允许发布成功");
+                //     this.$refs["form"].reset();
+                //     this.getList();
+                // }).catch(function () { }))
+
+            },
+            /**不允许发布 */
+            async notAllowed() {
+                const id = this.form.taskId;
+                console.log("不允许发布", id);
+                await executeConfirmedRequest(notAllowed, id, "是否确认不允许发布？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
+                this.open = false;
+                this.getList();
+                // this.$confirm('是否确认不允许发布?', "警告", {
+                //     confirmButtonText: "确定",
+                //     cancelButtonText: "取消",
+                //     type: "warning"
+                // }).then(function () {
+                //     return allowPublish(id);
+                // }.then()
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.queryParams.pageSize = val
+                this.getList();
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+                this.queryParams.pageNum = val
+                this.getList();
+            },
+            resetForm(formRef) {
+                if (this.$refs[formRef]) {
+                    this.$refs[formRef].reset();
+                    console.log("表单已重置！");
+                } else {
+                    console.error("未找到指定的表单引用！");
                 }
-            });
-        },
-        /** 查看按钮操作 */
-        handleView(id) {
-
-            getDelegateByTaskID(id).then(response => {
-                console.log("查看委托信息", response.data.data);
-                this.form = response.data.data;
-                this.operation = this.operations[response.data.data.status];
-                console.log("查看委托选项", this.operation);
-                this.open = true;
-                this.title = "查看委托信息";
-            });
-        },
-        /** 引导按钮操作 */
-        handleButtonClick(actionName) {
-            console.log("点击按钮", actionName);
-            // 在这里实现点击按钮时调用的逻辑，例如：
-            this[actionName]()
-            // this[actionName]() 或者 this.$emit(actionName)
-            // 具体实现取决于您的项目需求和上下文
-        },
-        /**删除 */
-        async delete() {
-            const id = this.form.taskId;
-            console.log("删除委托", id);
-            await executeConfirmedRequest(delDelegate, id, "是否确认删除该委托草稿？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
-            this.open = false;
-            this.getList();
-            // this.$confirm('是否确认删除该委托?', "警告", {
-            //     confirmButtonText: "确定",
-            //     cancelButtonText: "取消",
-            //     type: "warning"
-            // }).then(function () {
-            //     return delDelegateauditrecords(id);
-            // }).then(() => {
-            //     this.getList();
-            //     this.$modal.msgSuccess("删除成功");
-            //     this.$refs["form"].reset();
-            // }).catch(function () { });
-        },
-        /**退为草稿 */
-        async Fallback() {
-            const id = this.form.taskId;
-            console.log("退为草稿", id);
-            await executeConfirmedRequest(FallbackDraft, id, "是否确认退为草稿？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
-            this.open = false;
-            this.getList();
-            // this.$confirm('是否确认退为草稿?', "警告", {
-            //     confirmButtonText: "确定",
-            //     cancelButtonText: "取消",
-            //     type: "warning"
-            // }).then(function () {
-            //     return FallbackDraft(id);
-            // }.then(() => {
-            //     this.getList();
-            //     this.$modal.msgSuccess("退为草稿成功");
-            //     this.$refs["form"].reset();
-            // }).catch(function () { }))
-        },
-        /**允许发布 */
-        async allowPublish() {
-            const id = this.form.taskId;
-            console.log("允许发布", id);
-            await executeConfirmedRequest(allowPublish, id, "是否确认允许发布？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
-            this.open = false;
-            this.getList();
-            // this.$confirm('是否确认允许发布?', "警告", {
-            //     confirmButtonText: "确定",
-            //     cancelButtonText: "取消",
-            //     type: "warning"
-            // }).then(function () {
-            //     return allowPublish(id);
-            // }.then(() => {
-            //     this.getList();
-            //     this.$modal.msgSuccess("允许发布成功");
-            //     this.$refs["form"].reset();
-            //     this.getList();
-            // }).catch(function () { }))
-
-        },
-        /**不允许发布 */
-        async notAllowed() {
-            const id = this.form.taskId;
-            console.log("不允许发布", id);
-            await executeConfirmedRequest(notAllowed, id, "是否确认不允许发布？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
-            this.open = false;
-            this.getList();
-            // this.$confirm('是否确认不允许发布?', "警告", {
-            //     confirmButtonText: "确定",
-            //     cancelButtonText: "取消",
-            //     type: "warning"
-            // }).then(function () {
-            //     return allowPublish(id);
-            // }.then()
-        },
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
-            this.queryParams.pageSize = val
-            this.getList();
-        },
-        handleCurrentChange(val) {
-            console.log(`当前页: ${val}`);
-            this.queryParams.pageNum = val
-            this.getList();
-        },
-        resetForm(formRef) {
-            if (this.$refs[formRef]) {
-                this.$refs[formRef].reset();
-                console.log("表单已重置！");
-            } else {
-                console.error("未找到指定的表单引用！");
             }
         }
-    }
-};
+    };
 </script>
 
 <style lang="css" scoped>
-.input-reader-name /deep/ .el-input__inner {
-    width: 150px;
-    /* 或其他所需的宽度 */
-}
+    .input-reader-name /deep/ .el-input__inner {
+        width: 150px;
+        /* 或其他所需的宽度 */
+    }
 
-/* 根据需要设置行高 */
-.row-height {
-    height: 70px;
-    /* 设置行高为50像素 */
-}
+    /* 根据需要设置行高 */
+    .row-height {
+        height: 70px;
+        /* 设置行高为50像素 */
+    }
 </style>

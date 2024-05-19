@@ -32,7 +32,6 @@
 
         <el-table v-loading="loading" :data="delegateRecordsList" @selection-change="handleSelectionChange"
             :row-style="{ height: '50px' }">
-            <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="委托任务ID" align="center" prop="taskId" />
             <el-table-column label="委托发布者ID" align="center" prop="ownerId" />
             <el-table-column label="委托创建时间" align="center" prop="createdAt" />
@@ -59,12 +58,11 @@
                     <el-input v-model="form.taskId" placeholder="请输入委托任务ID" disabled />
                 </el-form-item>
                 <el-form-item label="委托内容" prop="ReviewComment">
-                    <el-input v-model="form.ReviewComment" type="textarea" placeholder="请输入内容" disabled />
+                    <el-input v-model="form.description" type="textarea" placeholder="请输入内容" disabled />
                 </el-form-item>
-                <el-form-item label="审核完成时间" prop="ReviewTime">
-                    <el-date-picker clearable v-model="form.ReviewTime" type="date" value-format="yyyy-MM-dd"
-                        placeholder="请选择审核完成时间" disabled>
-                    </el-date-picker>
+                <el-form-item label="委托发布地点" prop="ReviewTime">
+                    <el-input v-model="form.location" placeholder="请输入内容" disabled />
+
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -161,7 +159,7 @@
                         type: ["warning", "warn"],
                         click: ["withdrawReleaseAdmin", "fallbackDraftAdmin"]
                     },
-                    "已接收": {
+                    "已取消": {
                         index: 1,
                         title: ["删除记录"],
                         type: ["warning"],
@@ -306,17 +304,7 @@
                 const id = this.form.taskId;
                 console.log("删除委托", id);
                 await executeConfirmedRequest(delDelegate, this.form.userId, "是否确认删除该委托？", "提示", "警告", "操作警告", "操作失败，请稍后重试", "操作已取消");
-                // this.$confirm('是否确认删除该委托?', "警告", {
-                //     confirmButtonText: "确定",
-                //     cancelButtonText: "取消",
-                //     type: "warning"
-                // }).then(function () {
-                //     return delDelegateauditrecords(id);
-                // }).then(() => {
-                //     this.getList();
-                //     this.$modal.msgSuccess("删除成功");
-                //     this.$refs["form"].reset();
-                // }).catch(function () { });
+
             },
             /**退为草稿 */
             FallbackDraft() {

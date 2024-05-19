@@ -19,41 +19,43 @@
 </template>
 
 <style lang="less" scoped>
-.el-aside{
-    width: 200px;
-}
+    .el-aside {
+        width: 200px;
+        height: 100%;
+    }
 
-.el-container{
-    padding: 0px;
-
-    .el-header{
+    .el-container {
         padding: 0px;
-        height: 50px;
-        
+
+        .el-header {
+            padding: 0px;
+            height: 50px;
+
+        }
+
+        .el-main {
+            padding-top: 5px;
+        }
     }
-    .el-main{
-        padding-top: 5px;
-    }
-}
 </style>
 
 <script>
-import CommonAside from '../components/CommonAside.vue'
-import CommonHeader from '../components/CommonHeader.vue';
-import CommonTag from '@/components/CommonTag.vue';
+    import CommonAside from '../components/CommonAside.vue'
+    import CommonHeader from '../components/CommonHeader.vue';
+    import CommonTag from '@/components/CommonTag.vue';
 
-export default {
+    export default {
 
-    components: {
-        CommonAside,
-        CommonHeader,
-        CommonTag
-    },
-    data() {
-        return {
-            
+        components: {
+            CommonAside,
+            CommonHeader,
+            CommonTag
+        },
+        data() {
+            return {
+
+            }
+
         }
-
     }
-}
 </script>

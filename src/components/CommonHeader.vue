@@ -19,12 +19,15 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item @click.native="dialogAvatarVisible = true">
+            <i class="el-icon-user-solid"></i>
             修改头像
           </el-dropdown-item>
           <el-dropdown-item @click.native="handleNotice">
+            <i class="el-icon-message-solid"></i>
             查看通知
           </el-dropdown-item>
           <el-dropdown-item @click.native="handleLogout">
+            <i class="el-icon-switch-button"></i>
             退出登录
           </el-dropdown-item>
         </el-dropdown-menu>

@@ -7,11 +7,20 @@
             </h4>
             <!-- 在这里添加FAQ列表 -->
 
-            <p class="question">校园委托系统是什么？</p>
-            <p class="answer">校园委托系统是一个在线平台，允许学生、教职工或其他校园成员发布和接受各种校园内的委托任务。这些任务可能包括帮忙取快递、购买教材、参与校园活动组织等。</p>
-
-            <p class="question">我如何使用校园委托系统？</p>
-            <p class="answer">按照提示填写个人信息进行注册。注册成功后，你可以浏览并发布委托任务，或接受他人发布的任务。</p>
+            <div class="question" @click="toggleAnswer(1)">
+                <span>校园委托系统是什么？</span>
+                <span class="arrow">&#9660;</span> <!-- 向下箭头图标，用于表示展开/收起状态 -->
+            </div>
+            <p class="answer answer_1">
+                校园委托系统是一个在线平台，允许学生、教职工或其他校园成员发布和接受各种校园内的委托任务。这些任务可能包括帮忙取快递、购买教材、参与校园活动组织等。
+            </p>
+            <div class="question" @click="toggleAnswer(2)">
+                <span>我如何使用校园委托系统？</span>
+                <span class="arrow">&#9660;</span>
+            </div>
+            <p class="answer answer_2">
+                按照提示填写个人信息进行注册。注册成功后，你可以浏览并发布委托任务，或接受他人发布的任务。
+            </p>
             <p class="question">发布任务需要支付费用吗？</p>
             <p class="answer">现阶段，系统允许免费发布任务。你可以在发布任务前查看系统规定或联系客服了解详情。</p>
             <p class="question">如何确保任务的完成质量和安全性？</p>
@@ -48,7 +57,60 @@
     export default {
         name: 'HelpSupport',
         // ... 其他选项，如data, methods等  
-    }  
+        data() {
+            return {
+                // ... 其他数据
+            }
+        },
+        methods: {
+            toggleAnswer(index) {
+                // 切换回答的显示状态
+                const answer = document.querySelector(`.answer_${index}`);
+                /**
+                * 查询并获取当前问题元素中的箭头元素
+                * 该代码通过CSS选择器定位到特定索引的问题元素，然后在其内部查找并获取箭头元素。
+                * 
+                * @param {number} index - 问题元素的索引值，用于定位特定的问题元素。
+                * @returns {Element|null} - 返回匹配到的箭头元素，如果没有找到则返回null。
+                */
+                const arrow = document.querySelector(`.question:nth-child(${index}) .arrow`);
+                if (answer.style.display === 'none') {
+                    answer.style.display = 'block';
+                    if (index === 2) {
+                        console.log("index is 2");
+
+                    } else {
+
+                        if (index === 1) {
+                            console.log("index is 1");
+                        } else {
+                            console.log("index is not 1");
+                        }
+                        arrow.innerHTML = '&#9650;'; // 向上箭头图标
+                    }
+
+                } else {
+                    answer.style.display = 'none';
+
+                    if (index === 2) {
+                        console.log("index is 2");
+
+                    } else {
+
+                        if (index === 1) {
+                            console.log("index is 1");
+                        } else {
+                            console.log("index is not 1");
+                        }
+                        arrow.innerHTML = '&#9660;'; // 向下箭头图标
+                    }
+
+                }
+            }
+        }
+    }
+
+
 </script>
 
 <style scoped>
@@ -65,5 +127,6 @@
 
     .answer {
         margin-bottom: 20px;
+        display: none;
     }
 </style>

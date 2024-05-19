@@ -59,7 +59,6 @@
 
                     <el-table-column fixed="right" label="操作" width="250">
                         <template slot-scope="scope">
-                            <el-button @click="handleClick(scope.row.id)" type="success" size="small">查看</el-button>
                             <el-button type="danger" size="small">删除</el-button>
                         </template>
                     </el-table-column>

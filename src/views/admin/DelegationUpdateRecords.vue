@@ -25,10 +25,11 @@
 
 
         <el-table v-loading="loading" :data="delegateUpdatesRecordsList" @selection-change="handleSelectionChange">
+            <el-table-column label="更新记录编号" align="center" prop="updateId" />
             <el-table-column label="委托任务ID" align="center" prop="taskId" />
             <el-table-column label="操作人员ID" align="center" prop="userId" />
             <el-table-column label="更新类型”" align="center" prop="updateType" />
-            <el-table-column label="更新内容" align="center" prop="updateDescription" />
+            <el-table-column label="更新内容" align="center" prop="updateDescription" show-overflow-tooltip />
             <el-table-column label="更新时间时间" align="center" prop="updateTime" width="180">
                 <template slot-scope="scope">
                     <span>{{ scope.row.updateTime }}</span>
@@ -64,18 +65,16 @@
                     {{form.updateTime}}
                 </el-form-item>
             </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="submitForm">确 定</el-button>
-                <el-button @click="cancel">取 消</el-button>
-            </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import { listDelegateUpdateRecords, getDelegateauditrecords, delDelegateauditrecords, addDelegateauditrecords, updateDelegateauditrecords, getDelegateUpdateType, getViewDelegateRecord } from "@/api/";
+    import { listDelegateUpdateRecords, getDelegateauditrecords, delDelegateUpdateRecords, addDelegateauditrecords, updateDelegateauditrecords, getDelegateUpdateType, getViewDelegateRecord } from "@/api/";
 
     import initLayui from "@/layui/layuiInit";
+
+    import { executeConfirmedRequest } from '@/utils/globalConfirmAction'
 
     export default {
         name: "Delegateauditrecords",
@@ -212,14 +211,13 @@
                 });
             },
             /** 删除按钮操作 */
-            handleDelete(row) {
-                const RecordIDs = row.RecordID || this.ids;
-                this.$modal.confirm('是否确认删除存储委托信息审核记录编号为"' + RecordIDs + '"的数据项？').then(function () {
-                    return delDelegateauditrecords(RecordIDs);
-                }).then(() => {
-                    this.getList();
-                    this.$modal.msgSuccess("删除成功");
-                }).catch(() => { });
+            async handleDelete(row) {
+                const RecordIDs = row.updateId;
+
+                await executeConfirmedRequest(delDelegateUpdateRecords, RecordIDs, '是否确认删除存储委托信息记录编号为"' + RecordIDs + '"的数据项？', '删除委托更新记录');
+                this.getList();
+
+
             },
 
             handleSizeChange(val) {

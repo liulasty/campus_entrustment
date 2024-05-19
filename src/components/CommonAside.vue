@@ -1,8 +1,9 @@
 <template>
     <el-menu :default-active="activeIndex" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
         :collapse="isCollapse" background-color="#545c64" text-color="#fff" activeIndex="activeIndex"
-        active-text-color="#ffd04b">
+        active-text-color="#ffd04b" :unique-opened="isUniqueOpened">
         <h3>{{ isCollapse ? '委托' : '校园委托平台' }}</h3>
+
         <el-menu-item @click="clickMenu(item)" v-for="item in noChildren" :key="item.index" :index="item.index">
             <i :class="`el-icon-${item.icon}`"></i>
             <span slot="title">{{ item.label }}</span>
@@ -13,7 +14,10 @@
                 <span slot="title">{{ item.label }}</span>
             </template>
             <el-menu-item-group v-for="subItem in item.children" :key="subItem.index">
-                <el-menu-item @click="clickMenu(subItem)" :index="subItem.index">{{ subItem.label }}</el-menu-item>
+                <el-menu-item @click="clickMenu(subItem)" :index="subItem.index">
+                    <i :class="`el-icon-${subItem.icon}`"></i>
+                    {{ subItem.label }}
+                </el-menu-item>
             </el-menu-item-group>
         </el-submenu>
     </el-menu>
@@ -88,14 +92,14 @@
                     },
                     {
                         label: '我的委托',
-                        icon: 's-custom',
+                        icon: 's-unfold',
                         index: '4',
                         children: [
                             {
                                 path: '/myDelegationPublishList',
                                 name: 'myDelegationPublishList',
                                 label: '我的发布',
-                                icon: 'setting',
+                                icon: 'tickets',
                                 url: 'Other/PageOne',
                                 index: '4-1'
                             },
@@ -103,7 +107,7 @@
                                 path: '/myDelegationAcceptList',
                                 name: 'myDelegationAcceptList',
                                 label: '我的接收',
-                                icon: 'setting',
+                                icon: 'tickets',
                                 url: 'Other/PageTwo',
                                 index: '4-2'
                             }
@@ -117,6 +121,14 @@
                         url: 'eventItemMange/eventItemMange',
                         index: '5',
 
+                    },
+                    {
+                        path: '/athleteApplication',
+                        name: 'athleteApplication',
+                        label: '帮助与支持',
+                        icon: 's-custom',
+                        url: 'athleteApplication/athleteApplication',
+                        index: '6'
                     },
                     {
                         path: '/athleteApplication',
@@ -205,7 +217,7 @@
                             path: '/home',
                             name: 'home',
                             label: '首页',
-                            icon: 's-home',
+                            icon: 'data-line',
                             url: 'Home/Home',
                             index: '1'
                         },
@@ -213,20 +225,20 @@
                             path: '/userList',
                             name: 'userList',
                             label: '用户管理',
-                            icon: 's-home',
+                            icon: 'user',
                             url: '/userList',
                             index: '2',
                         },
                         {
                             label: '委托管理',
-                            icon: 'location',
+                            icon: 's-unfold',
                             index: '3',
                             children: [
                                 {
                                     path: '/draftList',
                                     name: 'draftList',
                                     label: '草稿与审核',
-                                    icon: 'setting',
+                                    icon: 's-grid',
                                     url: 'delegation/draftList',
                                     index: '3-1'
                                 },
@@ -234,7 +246,7 @@
                                     path: '/auditList',
                                     name: 'auditList',
                                     label: '发布与接收',
-                                    icon: 'setting',
+                                    icon: 's-grid',
                                     url: 'delegation/auditList',
                                     index: '3-2'
                                 },
@@ -242,7 +254,7 @@
                                     path: '/expireDelegationList',
                                     name: 'expireDelegationList',
                                     label: '未完成委托',
-                                    icon: 'setting',
+                                    icon: 's-grid',
                                     url: 'delegation/ExpireDelegationList',
                                     index: '3-3'
                                 },
@@ -250,7 +262,7 @@
                                     path: '/delegationUpdateRecords',
                                     name: 'delegationUpdateRecords',
                                     label: '委托更新记录',
-                                    icon: 'setting',
+                                    icon: 's-grid',
                                     url: 'delegation/DelegationUpdateRecords',
                                     index: '3-4'
                                 },
@@ -264,15 +276,16 @@
                                     path: '/systemBulletinList',
                                     name: 'systemBulletinList',
                                     label: '系统公告',
-                                    icon: 'setting',
+                                    icon: 'chat-dot-round',
                                     url: 'sys/systemBulletinList',
                                     index: '4-1'
                                 },
                                 {
+
                                     path: '/systemNoticeList',
                                     name: 'systemNoticeList',
                                     label: '系统通知',
-                                    icon: 'setting',
+                                    icon: 'chat-dot-round',
                                     url: 'sys/systemNoticeList',
                                     index: '4-2'
                                 },
