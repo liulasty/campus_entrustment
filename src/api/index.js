@@ -1,5 +1,3 @@
-
-import { data } from 'jquery';
 import http from '../utils/request'
 
 // import aliyun from '../utils/ailiyun.js'
@@ -535,7 +533,19 @@ export const attendProject = (id) => {
     return http.put("/registration/" + id)
 }
 
+export const exportExcel = () => {
+    return http.get("/reviews/exportExcel",{
+        responseType: 'blob'
+    })
+}
 
+export function downloadExcel(){
+    return http({
+        url: 'http://localhost:10101/user/export',
+        method: 'GET',
+        responseType:'blob'  // 重点
+    })
+}
 
 
 // export const loadImageAsBase64 =(url) =>{

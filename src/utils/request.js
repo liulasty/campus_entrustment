@@ -1,7 +1,7 @@
 import axios from "axios";
-``
+const API_PREFIX = process.env.VUE_APP_API_PREFIX_URL || '/api/campus_entrustment';
 const http = axios.create({
-  baseURL: 'http://localhost:80/campus_entrustment',
+  baseURL: API_PREFIX,
   timeout: 10000,
 
 })
@@ -25,6 +25,10 @@ http.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 http.interceptors.response.use(function (response) {
+  // console.log("response:", response)
+  if (response.request.responseType === "blob") {
+    return response;
+  }
   // 2xx 范围内的状态码都会触发该函数。
   // 对响应数据做点什么
 
@@ -37,11 +41,7 @@ http.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
   // 对响应错误做全局处理
-
   // 判断是否为HTTP请求错误
-
-
-
   return Promise.reject(error);
 });
 
