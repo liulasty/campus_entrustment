@@ -88,6 +88,8 @@ import { downloadFile } from '@/utils/downloadFile';
 import {updateAthlete} from '@/api'
 import ImageUploader from '@/components/ImageUploader.vue'
 import {executeConfirmedRequest} from '@/utils/globalConfirmAction'
+import * as XLSX from "xlsx";
+
 
 export default {
   components: {ImageUploader},
@@ -248,18 +250,59 @@ export default {
       this.getInfo();
     },
 
+    // async myInfoExportExcel() {
+    //   console.log("导出execl")
+    //   exportExcel().then((response) => {
+    //     try {
+    //       console.log("res:", response)
+    //       const fileName = `运动员信息${Date.now()}.xlsx`;
+    //       const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //       saveAs(blob, fileName);
+    //       this.$message.success("导出成功");
+    //     } catch (error) {
+    //       this.$message.error("文件创建或保存失败，请稍后重试");
+    //       console.error("文件创建或保存失败:", error);
+    //     }
+    //   })
+    // },
+
+
+
+
+
     async myInfoExportExcel() {
       console.log("导出execl")
-      exportExcel().then((response) => {
-        try {
-          console.log("res:", response)
-          const fileName = `运动员信息${Date.now()}.xlsx`;
-          const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          saveAs(blob, fileName);
-          this.$message.success("导出成功");
+      exportExcel().then((res) => {
+        const data = JSON.parse(res.data)
+        if(data.code === 1){
+          try {
+          //console.log(typeof res.data)
+          console.log(data.data)
+            const headers = ["评价ID", "对应的任务ID", "委托发布者的用户ID", "委托接收者的用户ID", "评价者的用户ID", "评价等级", "评价评论","是否已批准"]
+            const adjustedData = data.data.map(item => ({
+              "评价ID": item.reviewId,
+              "对应的任务ID": item.taskId,
+              "委托发布者的用户ID": item.publisherId,
+              "委托接收者的用户ID": item.acceptorId,
+              "评价者的用户ID": item.reviewerId,
+              "评价等级": item.rating,
+              "评价评论": item.comment,
+              "是否已批准": item.isApproved
+            }));
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(adjustedData, {
+              header: headers
+            });
+            XLSX.utils.book_append_sheet(workbook, worksheet, "运动员信息");
+            var  currentTime = new Date();
+            XLSX.writeFile(workbook, "运动员信息"+currentTime + ".xlsx");
+            this.$message.success("导出成功");
         } catch (error) {
           this.$message.error("文件创建或保存失败，请稍后重试");
           console.error("文件创建或保存失败:", error);
+        }
+        }else{
+          this.$message.success("导出失败");
         }
       })
     },
