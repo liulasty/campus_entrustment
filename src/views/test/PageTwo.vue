@@ -8,12 +8,12 @@
             <div class="layui-carousel" id="test1">
                 <div carousel-item>
                     <div>
-                        <img class="lunboImg" alt="条目1" src="../assets/avatar.jpg">
+                        <img class="lunboImg" alt="条目1" src="../../assets/avatar.jpg">
                     </div>
-                    <div><img class="lunboImg" src="../assets/bj.png" alt="条目2"></div>
-                    <div><img class="lunboImg" src="../assets/huaduo.png" alt="条目3"></div>
-                    <div><img class="lunboImg" src="../assets/logo.png" alt="条目4"></div>
-                    <div><img class="lunboImg" src="../assets/snut.png" alt="条目5"></div>
+                    <div><img class="lunboImg" src="../../assets/bj.png" alt="条目2"></div>
+                    <div><img class="lunboImg" src="../../assets/huaduo.png" alt="条目3"></div>
+                    <div><img class="lunboImg" src="../../assets/logo.png" alt="条目4"></div>
+                    <div><img class="lunboImg" src="../../assets/snut.png" alt="条目5"></div>
                 </div>
             </div>
         </div>

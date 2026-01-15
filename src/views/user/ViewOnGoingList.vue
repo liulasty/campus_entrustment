@@ -1,103 +1,130 @@
 <template>
-    <div>
-        <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
-            label-width="100px">
-            <el-form-item label="委托任务内容" prop="description" class="input-reader-name">
-                <el-input v-model="queryParams.description" placeholder="请输入委托内容关键词" clearable
-                    @keyup.enter.native="handleQuery" />
-            </el-form-item>
-            <el-form-item label="委托状态" prop="status" class="input-reader-name">
-                <el-select v-model="queryParams.status" clearable>
-                    <el-option label="委托发布中" value="ONGOING" />
-                    <el-option label="委托已接收" value="ACCEPTED" />
-                    <el-option label="委托已完成" value="COMPLETED" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="委托类型" prop="taskType" class="input-reader-name">
-                <el-select v-model="queryParams.taskType" clearable>
-                    <el-option v-for="dict in taskTypeOption" :key="dict.value" :label="dict.label"
-                        :value="dict.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="委托任务地点" prop="Location" class="input-reader-name">
-                <el-select v-model="queryParams.location" clearable>
-                    <el-option v-for="dict in locationType" :key="dict.value" :label="dict.label" :value="dict.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="发布时间" prop="queryRules" class="input-reader-name">
-                <el-select v-model="queryParams.queryRules">
-                    <el-option label="最新" value="0" />
-                    <el-option label="最早" value="1" />
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-            </el-form-item>
-        </el-form>
+    <div class="view-list-container">
+        <el-card shadow="hover" class="search-card">
+            <div slot="header" class="clearfix">
+                <span><i class="el-icon-search"></i> 筛选查询</span>
+            </div>
+            <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch"
+                label-width="100px">
+                <el-form-item label="委托任务内容" prop="description" class="input-reader-name">
+                    <el-input v-model="queryParams.description" placeholder="请输入委托内容关键词" clearable
+                        @keyup.enter.native="handleQuery" />
+                </el-form-item>
+                <el-form-item label="委托状态" prop="status" class="input-reader-name">
+                    <el-select v-model="queryParams.status" clearable>
+                        <el-option label="委托发布中" value="ONGOING" />
+                        <el-option label="委托已接收" value="ACCEPTED" />
+                        <el-option label="委托已完成" value="COMPLETED" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="委托类型" prop="taskType" class="input-reader-name">
+                    <el-select v-model="queryParams.taskType" clearable>
+                        <el-option v-for="dict in taskTypeOption" :key="dict.value" :label="dict.label"
+                            :value="dict.value" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="委托任务地点" prop="Location" class="input-reader-name">
+                    <el-select v-model="queryParams.location" clearable>
+                        <el-option v-for="dict in locationType" :key="dict.value" :label="dict.label" :value="dict.value" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="发布时间" prop="queryRules" class="input-reader-name">
+                    <el-select v-model="queryParams.queryRules">
+                        <el-option label="最新" value="0" />
+                        <el-option label="最早" value="1" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+                    <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-card>
 
 
+        <el-card shadow="hover" class="table-card">
+            <div slot="header" class="clearfix">
+                <span><i class="el-icon-s-order"></i> 委托列表</span>
+            </div>
+            <el-table v-loading="loading" :data="viewOnGoingList" :row-style="{ height: '50px' }" stripe border>
+                <el-table-column label="发布者ID" align="center" prop="ownerId" width="100" />
+                <el-table-column label="委托类型" align="center" prop="type" width="120">
+                    <template slot-scope="scope">
+                        <el-tag size="small">{{ scope.row.type }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="委托描述" align="center" prop="description" show-overflow-tooltip />
+                <el-table-column label="发布时间" align="center" prop="startTime" width="160" />
+                <el-table-column label="截止时间" align="center" prop="endTime" width="160" />
+                <el-table-column label="任务地点" align="center" prop="location" width="120" />
+                <el-table-column label="状态" align="center" prop="status" width="120">
+                     <template slot-scope="scope">
+                        <el-tag v-if="scope.row.status==='ONGOING'" type="success" size="small">发布中</el-tag>
+                        <el-tag v-else-if="scope.row.status==='ACCEPTED'" type="warning" size="small">已接收</el-tag>
+                        <el-tag v-else type="info" size="small">{{ scope.row.status }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="120">
+                    <template slot-scope="scope">
+                        <el-button size="mini" type="primary" plain icon="el-icon-view"
+                            @click="handleView(scope.row)">查看</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
 
-        <el-table v-loading="loading" :data="viewOnGoingList" :row-style="{ height: '50px' }">
-            <el-table-column label="委托发布者ID" align="center" prop="ownerId" />
-            <el-table-column label="委托类型" align="center" prop="type" />
-            <el-table-column label="委托描述" align="center" prop="description" show-overflow-tooltip />
-            <el-table-column label="委托发布时间" align="center" prop="startTime" />
-            <el-table-column label="委托截止时间" align="center" prop="endTime" />
-            <el-table-column label="委托任务地点" align="center" prop="location" />
-            <el-table-column label="委托状态" align="center" prop="status" width="180" />
-            <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-                <template slot-scope="scope">
-                    <el-button size="mini" type="text" icon="el-icon-view"
-                        @click="handleView(scope.row)">查看详情</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-            :current-page=queryParams.pageNum :page-sizes="[5, 7, 10, 15]" :page-size=queryParams.pageSize
-            layout="total, sizes, prev, pager, next, jumper" :total="total" />
+            <div class="pagination-container">
+                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                    :current-page=queryParams.pageNum :page-sizes="[5, 10, 20, 50]" :page-size=queryParams.pageSize
+                    layout="total, sizes, prev, pager, next, jumper" :total="total" background />
+            </div>
+        </el-card>
 
         <!-- 添加或修改存储委托信息审核记录对话框 -->
-        <el-dialog :title="title" :visible.sync="open" width="850px" top="10px" append-to-body>
-            <el-row>
+        <el-dialog :title="title" :visible.sync="open" width="850px" top="10vh" append-to-body center custom-class="detail-dialog">
+            <el-row :gutter="20">
                 <el-col :span="12">
-                    <el-card class="box-card Info-card">
-                        <el-form ref="form" :model="form" label-width="110px">
+                    <el-card class="box-card info-card" shadow="never">
+                        <div slot="header">
+                            <span>发布者信息</span>
+                        </div>
+                        <el-form ref="form" :model="form" label-width="100px" label-position="left">
 
-                            <el-form-item label="发布者名字" prop="name">
+                            <el-form-item label="姓名">
                                 {{form.usersInfo.name}}
                             </el-form-item>
-                            <el-form-item label="发布者QQ" prop="qqNumber">
+                            <el-form-item label="QQ">
                                 {{form.usersInfo.qqNumber}}
                             </el-form-item>
-                            <el-form-item label="发布者电话" prop="phoneNumber">
+                            <el-form-item label="电话">
                                 {{form.usersInfo.phoneNumber}}
                             </el-form-item>
-                            <el-form-item label="发布者身份" prop="userRole">
-                                {{form.usersInfo.userRole}}
+                            <el-form-item label="身份">
+                                <el-tag size="mini">{{form.usersInfo.userRole}}</el-tag>
                             </el-form-item>
-                            <el-form-item label="委托任务内容" prop="name">
-                                {{form.task.description}}
-                            </el-form-item>
-                            <el-form-item label="委托任务地点" prop="qqNumber">
-                                {{form.task.location}}
-                            </el-form-item>
-                            <el-form-item label="委托类型" prop="phoneNumber">
-                                {{form.task.type}}
-                            </el-form-item>
-                            <el-form-item label="委托截止时间" prop="userRole">
-                                {{form.task.endTime}}
-                            </el-form-item>
-
-
                         </el-form>
-
                     </el-card>
-
-
                 </el-col>
                 <el-col :span="12">
+                     <el-card class="box-card info-card" shadow="never">
+                        <div slot="header">
+                            <span>任务详情</span>
+                        </div>
+                        <el-form ref="formTask" :model="form" label-width="100px" label-position="left">
+                            <el-form-item label="任务内容">
+                                {{form.task.description}}
+                            </el-form-item>
+                            <el-form-item label="任务地点">
+                                {{form.task.location}}
+                            </el-form-item>
+                            <el-form-item label="委托类型">
+                                {{form.task.type}}
+                            </el-form-item>
+                            <el-form-item label="截止时间">
+                                {{form.task.endTime}}
+                            </el-form-item>
+                        </el-form>
+                    </el-card>
+                </el-col>
                     <el-card class="box-card publisher-card">
                         <div slot="header" class="clearfix">
                             <span>该委托发布者发布情况</span>
@@ -443,34 +470,83 @@
 
     }
 </script>
-<style scoped>
-    .el-input {
-        width: 180px;
+<style lang="less" scoped>
+    .view-list-container {
+        padding: 10px;
     }
 
-    .el-select {
-        width: 130px;
-    }
-
-    .publisher-card {
-
-        height: 300px;
-        margin-bottom: 10px;
-    }
-
-    .Info-card {
-        margin-right: 10px;
-    }
-
-    .like {
-        cursor: pointer;
-        font-size: 25px;
-        display: inline-block;
-    }
-
-    .el-statistic-wrapper {
-        margin-top: 10px;
+    .search-card {
         margin-bottom: 20px;
-        margin-left: 20px;
+        
+        .clearfix {
+            span {
+                font-size: 16px;
+                font-weight: 600;
+                color: #303133;
+                
+                i {
+                    margin-right: 5px;
+                    color: #409EFF;
+                }
+            }
+        }
+        
+        .el-form-item {
+            margin-bottom: 10px;
+        }
+    }
+    
+    .table-card {
+        .clearfix {
+            span {
+                font-size: 16px;
+                font-weight: 600;
+                color: #303133;
+                
+                i {
+                    margin-right: 5px;
+                    color: #409EFF;
+                }
+            }
+        }
+        
+        .pagination-container {
+            margin-top: 20px;
+            text-align: right;
+        }
+    }
+    
+    .info-card {
+        height: 100%;
+        
+        /deep/ .el-card__header {
+            padding: 10px 20px;
+            font-weight: bold;
+            background-color: #f5f7fa;
+        }
+        
+        .el-form-item {
+            margin-bottom: 5px;
+            border-bottom: 1px dashed #ebeef5;
+            padding-bottom: 5px;
+            
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+    }
+    
+    /deep/ .detail-dialog {
+        border-radius: 8px;
+        
+        .el-dialog__header {
+            border-bottom: 1px solid #ebeef5;
+            padding: 20px;
+        }
+        
+        .el-dialog__body {
+            padding: 30px 20px;
+            background-color: #f9fafc;
+        }
     }
 </style>

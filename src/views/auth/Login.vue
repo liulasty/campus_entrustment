@@ -1,47 +1,51 @@
 <template>
   <div id="LogionBody">
-    <div class="demo-image__placeholder">
-      <div class="block">
-        <div class="image-container" @click="goShowye">
-          <el-image :src="src" class="custom-image"></el-image>
-          <div class="text-overlay">
-            校园委托系统
-          </div>
+    <div class="background-overlay"></div>
+    <div class="content-container">
+      <div class="brand-section" @click="goShowye">
+        <div class="brand-logo">
+          <i class="el-icon-school"></i>
         </div>
+        <h1 class="brand-title">校园委托系统</h1>
+        <p class="brand-slogan">连接 · 互助 · 共赢</p>
       </div>
-    </div>
-    <div class="container" :class="{ 'panel-active': isPanelActive }">
-      <!-- 登录 -->
-      <LoginForm
-          :loginInfo="loginInfo"
-          @login="loginCheck"
-          @togglePanel="togglePanel"
-      />
+      
+      <div class="auth-card-wrapper">
+        <div class="container" :class="{ 'panel-active': isPanelActive }">
+          <!-- 登录 -->
+          <LoginForm
+              :loginInfo="loginInfo"
+              @login="loginCheck"
+              @togglePanel="togglePanel"
+          />
 
-      <!-- 注册 -->
-      <RegisterForm
-          :registerInfo="registerInfo"
-          @register="registerCheck"
-          @togglePanel="togglePanel"
-      />
+          <!-- 注册 -->
+          <RegisterForm
+              :registerInfo="registerInfo"
+              @register="registerCheck"
+              @togglePanel="togglePanel"
+          />
 
-      <!-- 浮层 -->
-      <div class="overlay-box">
-        <div class="overlay">
-          <div class="panel over-left">
-            <button class="btn" @click="togglePanel(false)">已有账号？立即登陆</button>
-          </div>
-          <div class="panel over-right">
-            <button class="btn" @click="togglePanel(true)">无账号？前往注册</button>
+          <!-- 浮层 -->
+          <div class="overlay-box">
+            <div class="overlay">
+              <div class="panel over-left">
+                <h3>已有账号？</h3>
+                <p>请登录以继续使用服务</p>
+                <button class="btn ghost" @click="togglePanel(false)">立即登录</button>
+              </div>
+              <div class="panel over-right">
+                <h3>没有账号？</h3>
+                <p>立即注册加入我们</p>
+                <button class="btn ghost" @click="togglePanel(true)">注册账号</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-
-
 
 <script>
 import { login, register } from '@/api';
@@ -84,7 +88,6 @@ export default {
           pattern: /^\d{11}$/u,
         },
       },
-      src: 'shouyesuolv.jpg',
     };
   },
   methods: {
@@ -108,7 +111,10 @@ export default {
           localStorage.setItem('jwtToken', data.data.token);
           localStorage.setItem('TaskUser', JSON.stringify(data.data));
           this.$store.commit('loginUser', data.data);
-          this.$router.push('/main');
+          
+          // 使用 replace 而不是 push，防止用户点击后退按钮返回登录页
+          this.$router.replace('/home');
+          
           this.$message({
             showClose: true,
             message: '恭喜你，登录成功',
@@ -195,52 +201,93 @@ export default {
 </script>
 
 <style>
+    /* Reset & Base */
     * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
     }
 
-    .demo-image__placeholder {
-        padding-top: 2%;
-        padding-left: 2%;
-    }
-
-    .custom-image {
-        width: 180px;
-
-    }
-
-    .image-container {
-        position: relative;
-    }
-
-    .text-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 16px;
-        color: white;
-    }
-
-    /* 将样式单独放在一个 CSS 文件中 */
     #LogionBody {
       display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background-image: url('../assets/huaduo.png');
+      background-image: url('../../assets/huaduo.png');
       background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .background-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(9, 92, 145, 0.8) 0%, rgba(3, 147, 163, 0.8) 100%);
+      backdrop-filter: blur(5px);
+      z-index: 1;
+    }
+
+    .content-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .brand-section {
+      text-align: center;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .brand-section:hover {
+      transform: scale(1.05);
+    }
+
+    .brand-logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .brand-title {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .brand-slogan {
+      font-size: 16px;
+      opacity: 0.9;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .auth-card-wrapper {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      overflow: hidden;
+      width: 768px;
+      max-width: 100%;
+      min-height: 480px;
     }
 
     .container {
       width: 100%;
-      max-width: 758px;
-      height: 420px;
+      height: 480px;
       position: relative;
-      margin: auto;
+      background: #fff;
     }
-
 
     .formBox {
         height: 100%;
@@ -263,7 +310,7 @@ export default {
     }
 
     .form {
-        background-color: #e9e9e9;
+        background-color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -274,51 +321,74 @@ export default {
     }
 
     .input {
-        background-color: #fff;
+        background-color: #f3f4f6;
         border: none;
-        padding: 0.9rem 0.9rem;
-        margin: 0.5rem 0;
+        padding: 12px 15px;
+        margin: 8px 0;
         width: 100%;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .input:focus {
+        outline: none;
+        background-color: #fff;
+        box-shadow: 0 0 0 2px rgba(3, 147, 163, 0.2);
     }
 
     .title {
-        font-weight: 300;
-        margin: 0;
-        margin-bottom: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 24px;
     }
 
     .link {
-        color: #333;
-        font-size: 16px;
-        margin: 1.5rem 0;
+        color: #666;
+        font-size: 14px;
+        margin: 15px 0;
         text-decoration: none;
+        transition: color 0.3s ease;
     }
 
+    .link:hover {
+        color: #0393a3;
+    }
 
     .btn {
-        background-color: #095c91;
-        background-image: linear-gradient(90deg, #095c91 0%, #0393a3 74%);
-        border-radius: 5px;
+        background: linear-gradient(90deg, #095c91 0%, #0393a3 100%);
+        border-radius: 25px;
         border: none;
-        color: #e9e9e9;
+        color: #ffffff;
         cursor: pointer;
-        font-size: 0.8rem;
+        font-size: 14px;
         font-weight: bold;
-        letter-spacing: 0.1rem;
-        padding: 0.9rem 4rem;
+        letter-spacing: 1px;
+        padding: 12px 45px;
         text-transform: uppercase;
-        transition: transform 80ms ease-in;
-    }
-
-    .form>.btn {
-        margin-top: 1.5rem;
+        transition: transform 80ms ease-in, box-shadow 0.3s ease;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(3, 147, 163, 0.3);
     }
 
     .btn:active {
         transform: scale(0.95);
     }
 
+    .btn:hover {
+        box-shadow: 0 6px 20px rgba(3, 147, 163, 0.4);
+    }
 
+    .btn.ghost {
+        background: transparent;
+        border: 2px solid #ffffff;
+        box-shadow: none;
+    }
+
+    .btn.ghost:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
 
     .overlay-box {
         height: 100%;
@@ -332,7 +402,11 @@ export default {
     }
 
     .overlay {
-        background-color: rgba(255, 255, 255, 0.25);
+        background: linear-gradient(135deg, #095c91 0%, #0393a3 100%);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: 0 0;
+        color: #ffffff;
         height: 100%;
         left: -100%;
         position: relative;
@@ -353,6 +427,20 @@ export default {
         top: 0;
         transform: translateX(0);
         transition: transform 0.6s ease-in-out;
+        padding: 0 40px;
+    }
+
+    .panel h3 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .panel p {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.5px;
+        margin-bottom: 30px;
     }
 
     .over-left {
@@ -364,8 +452,6 @@ export default {
         transform: translateX(0);
     }
 
-
-
     .panel-active .login {
         transform: translateX(100%);
     }
@@ -373,7 +459,7 @@ export default {
     .panel-active .register {
         opacity: 1;
         transform: translateX(100%);
-        z-index: 3;
+        z-index: 5;
     }
 
     .panel-active .overlay-box {
@@ -390,5 +476,40 @@ export default {
 
     .panel-active .over-right {
         transform: translateX(20%);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .auth-card-wrapper {
+            width: 90%;
+            min-height: 600px;
+        }
+
+        .container {
+            height: 600px;
+        }
+
+        .formBox {
+            width: 100%;
+            height: 60%;
+            top: 40%;
+        }
+
+        .overlay-box {
+            width: 100%;
+            height: 40%;
+            top: 0;
+            left: 0;
+        }
+
+        .overlay {
+            width: 100%;
+            height: 250%; /* Adjust for vertical movement */
+            left: 0;
+            top: -100%;
+        }
+        
+        /* Disable complex animation for mobile simpler view */
+        /* ... Mobile specific styles would go here for full responsiveness */
     }
 </style>

@@ -1,78 +1,86 @@
 <template>
-    <el-row>
-        <el-col :span="10" style="padding-right: 10px;">
-            <el-card :body-style="{ width: '510px', height: '360px' }">
-                <el-carousel height="320px" direction="vertical" :autoplay="false">
+    <el-row :gutter="20" class="dashboard-container">
+        <el-col :span="8">
+            <el-card class="box-card announcement-card" shadow="hover">
+                <div slot="header" class="clearfix">
+                    <span><i class="el-icon-bell"></i> 系统公告</span>
+                </div>
+                <el-carousel height="300px" direction="vertical" :autoplay="true" :interval="5000">
                     <el-carousel-item v-for="item in NewestInfo.systemAnnouncements" :key="item.announcementId">
-                        <h1 class="medium" id="infoTitle">
-                            {{ item.title }}
-                            <div v-if="item.isPinned == true" style="display: grid; align-items: center;">
-                                <el-tag type="success" size="small">置顶公告</el-tag>
+                        <div class="announcement-content">
+                            <h3 class="info-title">
+                                <el-tag v-if="item.isPinned" type="danger" size="mini" effect="dark">置顶</el-tag>
+                                {{ item.title }}
+                            </h3>
+                            <p class="info-desc">
+                                {{ item.content }}
+                            </p>
+                            <div class="info-meta">
+                                <span class="time"><i class="el-icon-time"></i> {{ item.publishTime }}</span>
                             </div>
-                        </h1>
-
-                        <p class="medium">
-                            {{ item.content }}
-                        </p>
-                        <div id="InfoTime">
-                            <div class="time">公告发布时间 : {{ item.publishTime }}</div>
-                            <div class="author">公告生效时间 : {{ item.startEffectiveTime }}</div>
-
-                            <div class="comment">{{ item.commentNum }}</div>
                         </div>
                     </el-carousel-item>
                 </el-carousel>
-
             </el-card>
-            <el-card style="margin-top: 10PX;height: 310PX;">
-                <el-table :data="tableData" height="270" style="width: 100%">
-                    <el-table-column label="最新委托信息">
-                        <el-table-column prop="type" label="类型" width="120">
-                        </el-table-column>
-                        <el-table-column prop="description" label="内容" width="120" show-overflow-tooltip>
-                        </el-table-column>
-                        <el-table-column prop="ownerId" label="发布者" width="80">
-                        </el-table-column>
-                        <el-table-column prop="startTime" label="发布时间" width="180">
-                        </el-table-column>
-                        <el-table-column prop="location" label="地点" width="120">
-                        </el-table-column>
+
+            <el-card class="box-card latest-task-card" shadow="hover" style="margin-top: 20px;">
+                <div slot="header" class="clearfix">
+                    <span><i class="el-icon-tickets"></i> 最新委托</span>
+                    <el-button style="float: right; padding: 3px 0" type="text" @click="$router.push('/viewOnGoingList')">更多</el-button>
+                </div>
+                <el-table :data="tableData" height="300" style="width: 100%" :show-header="true" size="small">
+                    <el-table-column prop="type" label="类型" width="80">
+                         <template slot-scope="scope">
+                            <el-tag size="mini">{{ scope.row.type }}</el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="description" label="内容" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column prop="startTime" label="发布时间" width="140">
+                         <template slot-scope="scope">
+                            <span style="font-size: 12px; color: #909399;">{{ scope.row.startTime }}</span>
+                        </template>
                     </el-table-column>
                 </el-table>
             </el-card>
         </el-col>
-        <el-col :span="14">
-            <div class="num">
-                <el-card v-for="item in countData" :key="item.name"
-                    :body-style="{ display: 'flex', padding: '0px', 'align-items': 'center', height: '60px', padding: '5px', width: '190px', margin: '5px 5px' }">
+
+        <el-col :span="16">
+            <div class="num-cards">
+                <el-card v-for="item in countData" :key="item.name" shadow="hover" class="num-card" :body-style="{ padding: '20px', display: 'flex', alignItems: 'center' }">
                     <i class="icon" :class="`el-icon-${item.icon}`" :style="{ background: item.color }" />
                     <div class="detail">
-                        <p class="price">{{ item.value }}条</p>
-                        <p class="desc">{{ item.name }} 委托</p>
+                        <p class="price">{{ item.value }}</p>
+                        <p class="desc">{{ item.name }}</p>
                     </div>
                 </el-card>
             </div>
 
-            <el-card :body-style="{ padding: '0px', width: '850px', }">
-                <div ref="echarts1" class="echarts1" style="height: 220px">
-
+            <el-card shadow="hover" class="chart-card" style="margin-top: 20px;">
+                <div slot="header" class="clearfix">
+                    <span><i class="el-icon-s-data"></i> 热门委托统计</span>
                 </div>
+                <div ref="echarts1" class="echarts-box" style="height: 300px; width: 100%;"></div>
             </el-card>
-            <div class="graph" style="padding-top: 10px;height: 300px;">
-                <el-card :body-style="{ padding: '5px' }">
-                    <div ref="echarts2" style="height: 150px;width: 360px;">
 
-                    </div>
-                </el-card>
-                <el-card :body-style="{ padding: '5px' }">
-                    <div ref="echarts3" style="height: 160px;width: 360px;">
-
-                    </div>
-                </el-card>
-            </div>
-
-
-
+            <el-row :gutter="20" style="margin-top: 20px;">
+                <el-col :span="12">
+                     <el-card shadow="hover">
+                        <div slot="header" class="clearfix">
+                            <span>新增数据</span>
+                        </div>
+                        <div ref="echarts2" style="height: 250px; width: 100%;"></div>
+                     </el-card>
+                </el-col>
+                <el-col :span="12">
+                     <el-card shadow="hover">
+                         <div slot="header" class="clearfix">
+                            <span>数据占比</span>
+                        </div>
+                        <div ref="echarts3" style="height: 250px; width: 100%;"></div>
+                     </el-card>
+                </el-col>
+            </el-row>
         </el-col>
     </el-row>
 </template>
@@ -548,146 +556,117 @@
 </script>
 
 <style lang="less" scoped>
-    * {
-        margin: 0;
-        padding: 0;
+    .dashboard-container {
+        padding: 10px;
     }
 
-    .userImg {
-        padding-bottom: 8px;
-        margin-bottom: 8px;
-        border-bottom: 1px solid #ccc;
-        display: flex;
-        align-items: center;
-
-        img {
-            margin-right: 40px;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-        }
-
-        .user-info {
-            .username {
-                font-size: 18px;
-                margin-bottom: 4px;
-            }
-
-            .access {
-                color: #888;
-            }
-
-        }
-
-    }
-
-    .login-info {
-        p {
-            line-height: 38px;
-            font-size: 14px;
-            color: #999999;
-
-            span {
-                color: #666666;
-                margin-left: 60px;
-            }
-        }
-    }
-
-    .num {
-        display: flex;
-        flex-wrap: wrap;
-
-        .icon {
-            width: 60px;
-            height: 60px;
-            font-size: 55px;
-            text-align: center;
-            padding: auto;
-            color: #000;
-            border-radius: 16%;
-            justify-content: center;
-        }
-
-        .detail {
-            height: 60px;
+    .box-card {
+        margin-bottom: 20px;
+        
+        .clearfix {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0px;
-            margin-top: 0px;
-            margin-left: 20px;
-
-            .price {
-                padding: 0px;
-                margin-top: 0px;
-                font-size: 24px;
-                margin-bottom: 0px;
-            }
-
-            .desc {
-                font-size: 12px;
-                color: #999;
-                text-align: center;
-            }
-        }
-
-        .el-card {
-            width: 31%;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            align-items: center;
             justify-content: space-between;
+            
+            span {
+                font-size: 16px;
+                font-weight: 600;
+                color: #303133;
+                
+                i {
+                    margin-right: 5px;
+                    color: #409EFF;
+                }
+            }
         }
-
     }
 
-    .graph {
-        display: flex;
-        //左右贴边
-        justify-content: space-between;
-        padding: 0px;
-
-
+    .announcement-card {
+        .announcement-content {
+            padding: 10px 20px;
+            text-align: left;
+            
+            .info-title {
+                font-size: 16px;
+                color: #303133;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                
+                .el-tag {
+                    margin-right: 8px;
+                }
+            }
+            
+            .info-desc {
+                font-size: 14px;
+                color: #606266;
+                line-height: 1.6;
+                height: 200px;
+                overflow-y: auto;
+                margin-bottom: 15px;
+            }
+            
+            .info-meta {
+                display: flex;
+                justify-content: space-between;
+                color: #909399;
+                font-size: 12px;
+                border-top: 1px solid #ebeef5;
+                padding-top: 10px;
+            }
+        }
     }
 
-    #infoTitle {
+    .num-cards {
         display: flex;
-        justify-content: center;
-    }
-
-    #InfoTime {
-        display: flex;
-        flex-direction: column-reverse;
         flex-wrap: wrap;
-        align-content: flex-end;
-        padding-right: 10px;
+        justify-content: space-between;
+        
+        .num-card {
+            width: 32%;
+            margin-bottom: 15px;
+            border: none;
+            
+            .icon {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+                text-align: center;
+                line-height: 60px;
+                color: #fff;
+                border-radius: 8px;
+            }
+            
+            .detail {
+                margin-left: 15px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                
+                .price {
+                    font-size: 24px;
+                    margin-bottom: 5px;
+                    line-height: 30px;
+                    height: 30px;
+                    color: #303133;
+                    font-weight: bold;
+                    margin: 0;
+                }
+                
+                .desc {
+                    font-size: 12px;
+                    color: #909399;
+                    text-align: center;
+                    margin: 0;
+                }
+            }
+        }
     }
-
-    .el-carousel__item h1 {
-        color: #475669;
-        font-size: 28px;
-        opacity: 0.75;
-        line-height: 70px;
-        text-align: center;
-        margin: 0;
-    }
-
-    .el-carousel__item p {
-        color: #080808;
-        font-size: 18px;
-        opacity: 0.75;
-        line-height: 40px;
-        text-align: center;
-        padding: 10px 20px;
-    }
-
-    .el-carousel__item:nth-child(2n) {
-        background-size: 430px 320px;
-        background-image: url("../assets/carousel.png");
-    }
-
-    .el-carousel__item:nth-child(2n+1) {
-        background-image: url('../assets/carousel.png');
-        background-size: 510px 320px;
+    
+    .chart-card {
+        /deep/ .el-card__body {
+            padding: 10px;
+        }
     }
 </style>

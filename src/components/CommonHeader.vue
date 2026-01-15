@@ -1,32 +1,48 @@
 <template>
   <div class="header-container">
     <div class="l-content">
-      <el-button @click="handleMenu" style="margin-right: 10px;" icon="el-icon-menu" size="medium"></el-button>
+      <el-button 
+        @click="handleMenu" 
+        class="menu-toggle-btn"
+        icon="el-icon-s-fold" 
+        size="small"
+        circle>
+      </el-button>
       <!-- 面包屑 -->
-      <el-breadcrumb separator="/">
-        <el-breadcrumb-item v-for="item in tags" :key="item.path" :to="{ path: item.path }" :id="generateUniqueId(item)"
+      <el-breadcrumb separator="/" class="custom-breadcrumb">
+        <el-breadcrumb-item 
+          v-for="item in tags" 
+          :key="item.path" 
+          :to="{ path: item.path }" 
+          :id="generateUniqueId(item)"
           :class="generateItemClass(item)">
           {{ item.label }}
         </el-breadcrumb-item>
-
       </el-breadcrumb>
 
     </div>
     <div class="r-content">
-      <el-dropdown>
-        <span class="el-dropdown-link">
-          <img class="userIcon" :src="avatarSrc" alt="用户">
-        </span>
-        <el-dropdown-menu slot="dropdown">
+      <div class="action-item">
+        <el-tooltip content="全屏" placement="bottom">
+            <i class="el-icon-full-screen action-icon"></i>
+        </el-tooltip>
+      </div>
+      <div class="action-item">
+          <el-badge :value="3" class="item">
+            <i class="el-icon-bell action-icon" @click="handleNotice"></i>
+          </el-badge>
+      </div>
+      <el-dropdown trigger="click" class="avatar-dropdown">
+        <div class="avatar-wrapper">
+          <img class="userIcon" :src="avatarSrc || require('../assets/avatar.jpg')" alt="用户">
+          <i class="el-icon-caret-bottom"></i>
+        </div>
+        <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <el-dropdown-item @click.native="dialogAvatarVisible = true">
-            <i class="el-icon-user-solid"></i>
+            <i class="el-icon-user"></i>
             修改头像
           </el-dropdown-item>
-          <el-dropdown-item @click.native="handleNotice">
-            <i class="el-icon-message-solid"></i>
-            查看通知
-          </el-dropdown-item>
-          <el-dropdown-item @click.native="handleLogout">
+          <el-dropdown-item divided @click.native="handleLogout">
             <i class="el-icon-switch-button"></i>
             退出登录
           </el-dropdown-item>
@@ -35,11 +51,11 @@
 
 
       <el-dialog title="修改头像" :visible.sync="dialogAvatarVisible" @close="handleDialogClose" :width="dialogWidth"
-        class="my-dialog">
+        class="my-dialog" append-to-body>
         <avatarShowVue :initialSrc="avatarSrc" />
       </el-dialog>
-      <el-dialog title="通知" :visible.sync="dialogNoticeVisible" @close="handleDialogClose" width="900px"
-        class="my-dialog" top="5vh">
+      <el-dialog title="通知中心" :visible.sync="dialogNoticeVisible" @close="handleDialogClose" width="800px"
+        class="my-dialog" top="10vh" append-to-body>
         <noticeVue :userId="userId" />
       </el-dialog>
     </div>
@@ -65,7 +81,7 @@
         imageUrl: '',
         initialImageSrc: '',
         avatarSrc: '',
-        dialogWidth: '800px',
+        dialogWidth: '600px',
         dialogNoticeVisible: false,
         userId: '',
       }
@@ -173,97 +189,188 @@
 </script>
 
 <style lang="less" scoped>
-  .tooltip {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(242, 14, 14, 0.5);
-    color: #121111;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: none;
-  }
-
   .header-container {
-    background-color: rgb(61, 151, 203);
-    height: 50px;
+    background-color: #ffffff;
+    height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-left: 20px;
-
-    .text {
-      color: #fff;
-      font-size: 14px;
-      margin-left: 10px;
-    }
-
-    .r-content {
-      .userIcon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-      }
-    }
+    padding: 0 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1000;
+    transition: all 0.3s ease;
 
     .l-content {
       display: flex;
       align-items: center;
+      flex: 1;
+      overflow: hidden;
 
-      /* 用于修改具有特定类名的元素的样式，这些类名是在一个包含 .el-breadcrumb__item 的深度（/deep/）选择器内的 */
-      /deep/.el-breadcrumb__item {
-        .el-breadcrumb__inner {
-          /* &.is-link 表示选择那些具有 .el-breadcrumb__inner 类名并且还具有 .is-link 类名的元素。& 在这里代表当前选择器，所以它表示的是 .el-breadcrumb__inner。 */
-          font-weight: 500;
-
-          &.is-link {
-            color: #666;
-            cursor: pointer;
-          }
-        }
-
-        &:last-child {
-          .el-breadcrumb__inner {
-            /*  color: #fff; */
-          }
-
+      .menu-toggle-btn {
+        margin-right: 20px;
+        border: none;
+        font-size: 20px;
+        color: #606266;
+        background: transparent;
+        transition: all 0.3s;
+        
+        &:hover {
+          color: #409EFF;
+          transform: scale(1.1);
+          background-color: rgba(64, 158, 255, 0.1);
         }
       }
 
-      /deep/.current_bread {
-        .el-breadcrumb__inner {
-          color: aquamarine;
-          background-color: #0ce9ae;
+      .custom-breadcrumb {
+        font-size: 14px;
+        line-height: 60px;
+        margin-left: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        /deep/ .el-breadcrumb__item {
+          .el-breadcrumb__inner {
+            color: #909399;
+            font-weight: 500;
+            transition: color 0.3s;
+            
+            &.is-link:hover {
+              color: #409EFF;
+              font-weight: 600;
+            }
+          }
+
+          &:last-child .el-breadcrumb__inner {
+             color: #303133;
+             font-weight: 700;
+          }
+        }
+      }
+    }
+
+    .r-content {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      flex-shrink: 0;
+
+      .action-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12px;
+        height: 100%;
+        color: #606266;
+        cursor: pointer;
+        transition: all 0.3s;
+        border-radius: 4px;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.04);
+          color: #409EFF;
+        }
+        
+        .action-icon {
+          font-size: 20px;
+        }
+
+        .item {
+          display: flex;
+          align-items: center;
+          
+          /deep/ .el-badge__content {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+        }
+      }
+
+      .avatar-dropdown {
+        margin-left: 20px;
+        cursor: pointer;
+
+        .avatar-wrapper {
+          display: flex;
+          align-items: center;
+          padding: 4px;
+          border-radius: 24px;
+          transition: background 0.3s;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.04);
+          }
+          
+          .userIcon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+
+            &:hover {
+              transform: rotate(360deg);
+            }
+          }
+
+          .el-icon-caret-bottom {
+            margin-left: 8px;
+            font-size: 12px;
+            color: #909399;
+          }
         }
       }
     }
   }
 
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
+  /* 响应式适配 */
+  @media screen and (max-width: 768px) {
+    .header-container {
+      padding: 0 12px;
+
+      .l-content {
+        .custom-breadcrumb {
+          display: none; // 移动端隐藏面包屑
+        }
+      }
+
+      .r-content {
+        .action-item {
+          padding: 0 8px;
+          
+          .action-icon {
+            font-size: 18px;
+          }
+        }
+
+        .avatar-dropdown {
+          margin-left: 10px;
+          
+          .avatar-wrapper {
+            .userIcon {
+              width: 32px;
+              height: 32px;
+            }
+          }
+        }
+      }
+    }
   }
 
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
+  /* 覆盖Element UI 样式 */
+  /deep/.el-dialog__header {
+    border-bottom: 1px solid #ebeef5;
+    padding: 20px;
   }
-
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
+  
+  /deep/.el-dialog__body {
+    padding: 30px 20px;
   }
-
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
+  
+  /deep/.el-dialog {
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
   }
 </style>

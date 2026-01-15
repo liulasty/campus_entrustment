@@ -1,17 +1,17 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Main from '../views/Main.vue'
-import pageOne from '../views/PageOne.vue'
-import pageTwo from '../views/PageTwo.vue'
-import pageThree from '../views/pageThree'
-import Login from '../views/login.vue'
-import Sports from '../views/shouye.vue'
-import Athlete from '../views/Athlete.vue'
-import EventItem from '../views/EventItem.vue'
-import AthleteApplication from '../views/AthleteApplication.vue'
-import User from '../views/User.vue'
-import myInfo from '../views/myInfo.vue'
+import Home from '../views/dashboard/Home.vue'
+import Main from '../views/layout/Main.vue'
+import pageOne from '../views/test/PageOne.vue'
+import pageTwo from '../views/test/PageTwo.vue'
+import pageThree from '../views/test/PageThree.vue'
+import Login from '../views/auth/Login.vue'
+import Landing from '../views/public/Landing.vue'
+import Athlete from '../views/athlete/Athlete.vue'
+import EventItem from '../views/event/EventItem.vue'
+import AthleteApplication from '../views/athlete/AthleteApplication.vue'
+import UserManagement from '@/views/user/UserManagement.vue'
+import MyInfo from '../views/user/MyInfo.vue'
 import CreateDelegation from '@/views/user/CreateDelegation.vue'
 import UserList from '@/views/admin/UserList.vue'
 import DraftList from '@/views/admin/DraftList.vue'
@@ -49,11 +49,11 @@ const routes = [
             },
             { path: '/home', name: 'home', component: Home },
             { path: '/createDelegation', name: 'createDelegation', component: CreateDelegation },
-            { path: '/user', name: 'user', component: User },
+            { path: '/user', name: 'user', component: UserManagement },
             { path: '/athlete', name: 'athlete', component: Athlete },
             { path: '/eventItem', name: 'eventItem', component: EventItem },
             { path: '/athleteApplication', name: 'athleteApplication', component: AthleteApplication },
-            { path: '/myInfo', name: 'myInfo', component: myInfo },
+            { path: '/myInfo', name: 'myInfo', component: MyInfo },
             { path: '/page1', name: 'page1', component: pageOne },
             { path: '/page2', name: 'page2', component: pageTwo },
             { path: '/page3', name: 'page3', component: pageThree },
@@ -77,8 +77,8 @@ const routes = [
     // 默认页面
     {
         path: '/',
-        name: 'sports',
-        component: Sports,
+        name: 'landing',
+        component: Landing,
     },
 
 
@@ -104,6 +104,36 @@ const router = new VueRouter({
     base: '/campus_entrustment/'
 })
 
+// 添加全局前置导航守卫
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem('jwtToken');
+    const LOGIN_PATH = '/login';
+    const REGISTER_PATH = '/register'; // 假设有注册页面路由，虽然 routes 里没显式看到单独的 register path，但可能有
+    const LANDING_PATH = '/';
+    
+    // 公开路径，不需要登录即可访问
+    const publicPaths = [LOGIN_PATH, REGISTER_PATH, LANDING_PATH];
+
+    if (token) {
+        // 如果用户已登录
+        if (to.path === LOGIN_PATH || to.path === REGISTER_PATH) {
+            // 如果尝试访问登录或注册页，重定向到主页
+            next('/home');
+        } else {
+            // 访问其他页面，放行
+            next();
+        }
+    } else {
+        // 如果用户未登录
+        if (publicPaths.includes(to.path)) {
+            // 访问公开页面，放行
+            next();
+        } else {
+            // 访问受保护页面，重定向到登录页
+            next(LOGIN_PATH);
+        }
+    }
+});
 
 export default router
 

@@ -1,15 +1,28 @@
 <template>
-    <el-tabs type="border-card">
-        <el-tab-pane v-for="(pane, index) in tabPanes" :key="index" :label="pane.label" tab-click="">
-
-            <div v-show="pane.id != 0">
-                <!-- {{ pane.label }} -->
-                <Delegation :DelegationType="pane.label" :id="pane.id" :description="pane.DelegationType" :tasks="tasks"
-                    :taskTypeOption="taskTypeOption" @childEvent="getTaskDraft" />
+    <div class="create-delegation-container">
+        <el-card shadow="hover" class="box-card">
+            <div slot="header" class="clearfix">
+                <span><i class="el-icon-edit-outline"></i> 发布新委托</span>
             </div>
-
-        </el-tab-pane>
-    </el-tabs>
+            <el-tabs type="border-card" class="custom-tabs">
+                <el-tab-pane v-for="(pane, index) in tabPanes" :key="index" :label="pane.label">
+                    <span slot="label"><i class="el-icon-document"></i> {{pane.label}}</span>
+                    <div v-show="pane.id != 0" class="tab-content">
+                        <div class="delegation-desc">
+                             <el-alert
+                                :title="pane.DelegationType || '请填写以下信息发布新的委托任务'"
+                                type="info"
+                                show-icon
+                                :closable="false">
+                              </el-alert>
+                        </div>
+                        <Delegation :DelegationType="pane.label" :id="pane.id" :description="pane.DelegationType" :tasks="tasks"
+                            :taskTypeOption="taskTypeOption" @childEvent="getTaskDraft" />
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </el-card>
+    </div>
 </template>
 <script>
 
@@ -137,9 +150,41 @@
     }
 </script>
 
-<style>
-    .el-tabs__content {
-        height: 612px;
+<style lang="less" scoped>
+    .create-delegation-container {
+        padding: 10px;
+    }
 
+    .box-card {
+        .clearfix {
+            span {
+                font-size: 16px;
+                font-weight: 600;
+                color: #303133;
+                
+                i {
+                    margin-right: 5px;
+                    color: #409EFF;
+                }
+            }
+        }
+    }
+    
+    .custom-tabs {
+        box-shadow: none;
+        border: 1px solid #ebeef5;
+        
+        /deep/ .el-tabs__header {
+            background-color: #f5f7fa;
+            border-bottom: 1px solid #ebeef5;
+        }
+        
+        /deep/ .el-tabs__content {
+            padding: 20px;
+        }
+    }
+    
+    .delegation-desc {
+        margin-bottom: 20px;
     }
 </style>

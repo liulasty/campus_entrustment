@@ -1,8 +1,18 @@
 <template>
     <el-menu :default-active="activeIndex" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-        :collapse="isCollapse" background-color="#545c64" text-color="#fff" activeIndex="activeIndex"
-        active-text-color="#ffd04b" :unique-opened="isUniqueOpened">
-        <h3>{{ isCollapse ? '委托' : '校园委托平台' }}</h3>
+        :collapse="isCollapse" background-color="#304156" text-color="#bfcbd9" active-text-color="#409EFF"
+        :unique-opened="isUniqueOpened">
+        <div class="sidebar-logo-container" :class="{'collapse': isCollapse}">
+            <transition name="sidebarLogoFade">
+                <router-link v-if="isCollapse" key="collapse" class="sidebar-logo-link" to="/">
+                    <img src="../assets/logo.png" class="sidebar-logo">
+                </router-link>
+                <router-link v-else key="expand" class="sidebar-logo-link" to="/">
+                    <img src="../assets/logo.png" class="sidebar-logo">
+                    <h1 class="sidebar-title">校园委托平台</h1>
+                </router-link>
+            </transition>
+        </div>
 
         <el-menu-item @click="clickMenu(item)" v-for="item in noChildren" :key="item.index" :index="item.index">
             <i :class="`el-icon-${item.icon}`"></i>
@@ -23,33 +33,112 @@
     </el-menu>
 </template>
 
-
-
 <style lang="less" scoped>
     .el-menu-vertical-demo:not(.el-menu--collapse) {
-        width: 200px;
-        height: 792px;
+        width: 240px;
+        min-height: 400px;
     }
 
     .el-menu {
         height: 100vh;
-        border: 0px;
+        border: none;
+        background-color: #304156;
+        box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+        
+        .el-menu-item {
+            font-size: 14px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            
+            &:hover {
+                background-color: #263445 !important;
+                color: #fff !important;
+                i { color: #fff; }
+            }
+            
+            i {
+                color: #bfcbd9;
+                margin-right: 12px;
+                font-size: 18px;
+                transition: color 0.3s;
+            }
+            
+            &.is-active {
+                background-color: #1f2d3d !important;
+                color: #409EFF !important;
+                border-left-color: #409EFF;
+                
+                i {
+                    color: #409EFF;
+                }
+            }
+        }
 
-        h3 {
-            color: #fff;
-            text-align: center;
-            line-height: 48px;
-            font-size: 16px;
-            font-weight: 400;
+        .el-submenu {
+             /deep/ .el-submenu__title {
+                font-size: 14px;
+                
+                &:hover {
+                    background-color: #263445 !important;
+                }
+                
+                i {
+                    color: #bfcbd9;
+                    margin-right: 12px;
+                    font-size: 18px;
+                }
+            }
+        }
+    }
+
+    .sidebar-logo-container {
+        position: relative;
+        width: 100%;
+        height: 60px;
+        line-height: 60px;
+        background: #2b2f3a;
+        text-align: center;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,21,41,.08);
+
+        & .sidebar-logo-link {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+
+            & .sidebar-logo {
+                width: 32px;
+                height: 32px;
+                vertical-align: middle;
+                margin-right: 12px;
+            }
+
+            & .sidebar-title {
+                display: inline-block;
+                margin: 0;
+                color: #fff;
+                font-weight: 600;
+                line-height: 50px;
+                font-size: 18px;
+                font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+                vertical-align: middle;
+            }
+        }
+
+        &.collapse {
+            .sidebar-logo {
+                margin-right: 0px;
+            }
         }
     }
 </style>
 
 <script>
-
-
-
     export default {
+        // ... (保持原有的脚本逻辑不变)
         watch: {
             '$route'(to, from) {
                 // 在路由变化时触发，你可以在这里更新面包屑的样式
@@ -78,7 +167,7 @@
                         path: '/createDelegation',
                         name: 'createDelegation',
                         label: '发布委托',
-                        icon: 'user',
+                        icon: 'edit-outline',
                         url: 'user/CreateDelegation',
                         index: '2'
                     },
@@ -86,20 +175,20 @@
                         path: '/viewOnGoingList',
                         name: 'viewOnGoingList',
                         label: '浏览委托',
-                        icon: 's-custom',
+                        icon: 'search',
                         url: 'ongoing/ongoing',
                         index: '3'
                     },
                     {
                         label: '我的委托',
-                        icon: 's-unfold',
+                        icon: 's-order',
                         index: '4',
                         children: [
                             {
                                 path: '/myDelegationPublishList',
                                 name: 'myDelegationPublishList',
                                 label: '我的发布',
-                                icon: 'tickets',
+                                icon: 'document-add',
                                 url: 'Other/PageOne',
                                 index: '4-1'
                             },
@@ -107,7 +196,7 @@
                                 path: '/myDelegationAcceptList',
                                 name: 'myDelegationAcceptList',
                                 label: '我的接收',
-                                icon: 'tickets',
+                                icon: 'document-checked',
                                 url: 'Other/PageTwo',
                                 index: '4-2'
                             }
@@ -117,7 +206,7 @@
                         path: '/myInfo',
                         name: 'myInfo',
                         label: '个人信息',
-                        icon: 's-custom',
+                        icon: 'user-solid',
                         url: 'eventItemMange/eventItemMange',
                         index: '5',
 
@@ -126,40 +215,10 @@
                         path: '/athleteApplication',
                         name: 'athleteApplication',
                         label: '帮助与支持',
-                        icon: 's-custom',
-                        url: 'athleteApplication/athleteApplication',
-                        index: '6'
-                    },
-                    {
-                        path: '/athleteApplication',
-                        name: 'athleteApplication',
-                        label: '帮助与支持',
-                        icon: 's-custom',
+                        icon: 'question',
                         url: 'athleteApplication/athleteApplication',
                         index: '6'
                     }
-                    // ,
-                    // {
-                    //     label: '其他',
-                    //     icon: 'location',
-                    //     children: [
-                    //         {
-                    //             path: '/page1',
-                    //             name: 'page1',
-                    //             label: '页面1',
-                    //             icon: 'setting',
-                    //             url: 'Other/PageOne'
-                    //         },
-                    //         {
-                    //             path: '/page2',
-                    //             name: 'page2',
-                    //             label: '页面2',
-                    //             icon: 'setting',
-                    //             url: 'Other/PageTwo'
-                    //         },
-                    //     ]
-
-                    // }
                 ]
 
             };
@@ -270,7 +329,7 @@
                         },
                         {
                             label: '系统管理',
-                            icon: 'user', index: '4',
+                            icon: 'setting', index: '4',
                             children: [
                                 {
                                     path: '/systemBulletinList',
@@ -292,25 +351,17 @@
                             ]
                         },
                         {
-                            label: '校园委托相关设置',
-                            icon: 's-custom', index: '5',
+                            label: '委托设置',
+                            icon: 's-tools', index: '5',
                             children: [
                                 {
                                     path: '/delegationType',
                                     name: 'delegationType',
                                     label: '委托类别',
-                                    icon: 'setting',
+                                    icon: 'menu',
                                     url: 'setting/delegationType',
                                     index: '5-1'
-                                },
-                                {
-                                    path: '/systemNoticeList',
-                                    name: 'systemNoticeList',
-                                    label: '系统通知',
-                                    icon: 'setting',
-                                    url: 'setting/systemNoticeList',
-                                    index: '5-2'
-                                },
+                                }
                             ]
                         },
                         {
@@ -329,7 +380,7 @@
                                 {
                                     path: '/notifications',
                                     name: 'notifications',
-                                    label: '消息管理',
+                                    label: '消息列表',
                                     icon: 'chat-dot-square',
                                     url: 'Other/PageThree',
                                     index: '6-2'
@@ -396,10 +447,4 @@
 
         }
     }
-
 </script>
-<style lang="less" scoped>
-    .el-menu {
-        border-right: none;
-    }
-</style>
