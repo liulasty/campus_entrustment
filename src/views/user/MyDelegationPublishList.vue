@@ -100,6 +100,13 @@
                     </template>
                     <el-tag size="small">{{form.task.endTime}}</el-tag>
                 </el-descriptions-item>
+                <el-descriptions-item>
+                    <template slot="label">
+                        <i class="el-icon-money"></i>
+                        委托金额
+                    </template>
+                    {{form.task.money}} 元
+                </el-descriptions-item>
             </el-descriptions>
             <el-card v-show="form.task.status === '委托发布中'" class="box-card" style="margin-top: 10px;">
                 <div style="height: 250px;" v-show="form.taskAcceptRecordsStatus">
@@ -144,6 +151,26 @@
                     <loadingVue text="该为委托目前无人接收"></loadingVue>
                 </div>
             </el-card>
+
+            <el-card v-show="form.task.status === '已接收' || form.task.status === '已完成'" class="box-card" style="margin-top: 10px;">
+                <div slot="header" class="clearfix">
+                    <span>任务动态</span>
+                </div>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    <el-timeline>
+                        <el-timeline-item
+                            v-for="(activity, index) in taskUpdates"
+                            :key="index"
+                            :timestamp="activity.updateTime"
+                            :color="['进度更新', 5, 'PROGRESS_UPDATE'].includes(activity.updateType) ? '#0bbd87' : ''">
+                            {{activity.updateDescription}}
+                            <el-tag size="mini" v-if="['进度更新', 5, 'PROGRESS_UPDATE'].includes(activity.updateType)" type="success">进度</el-tag>
+                        </el-timeline-item>
+                    </el-timeline>
+                    <div v-if="taskUpdates.length === 0" style="text-align: center; color: #909399;">暂无动态</div>
+                </div>
+            </el-card>
+
             <el-card v-show="form.task.status === '已接收'" class="box-card" style="margin-top: 10px;">
 
                 <div slot="header" class="clearfix" style="margin-bottom: 5px;">
@@ -185,7 +212,7 @@
     </div>
 </template>
 <script>
-    import { getTaskCategories } from '@/api/'
+    import { getTaskCategories, listDelegateUpdateRecords } from '@/api/'
     import {
         publishDelegationList, queryTheEntrustmentDetailsByEntrustmentNumber, confirmTheRecipient,
         cancelPublishUser, updateDelegationCompleted
@@ -199,6 +226,7 @@
         data() {
 
             return {
+                taskUpdates: [],
                 //委托描述
                 descriptions: "",
                 count: 0,
@@ -409,6 +437,11 @@
                         });
                         this.operation = this.operations[`${this.form.task.status}`]
                         console.log("已发布的委托信息", this.form);
+                        
+                        if (this.form.task.status === '已接收' || this.form.task.status === '已完成') {
+                            this.getTaskUpdates(this.form.task.taskId);
+                        }
+                        
                         this.getDelegationAcceptListLength();
                         this.open = true;
                     } else {
@@ -421,6 +454,18 @@
                     }
                 });
 
+            },
+            getTaskUpdates(taskId) {
+                this.taskUpdates = [];
+                listDelegateUpdateRecords({
+                    taskId: taskId,
+                    pageNum: 1,
+                    pageSize: 100 
+                }).then(response => {
+                    if (response.data.code === 1) {
+                        this.taskUpdates = response.data.data.records;
+                    }
+                });
             },
             getDelegationAcceptListLength() {
 

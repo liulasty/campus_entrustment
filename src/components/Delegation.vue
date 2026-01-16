@@ -27,6 +27,10 @@
                             </el-select>
                         </el-form-item>
 
+                        <el-form-item label="委托金额" prop="money">
+                            <el-input-number v-model="DelegationFrom.money" :precision="2" :step="1" :min="0" placeholder="请输入委托金额"></el-input-number>
+                        </el-form-item>
+
                         <el-form-item label="委托内容" prop="content">
                             <el-input 
                                 type="textarea" 
@@ -87,6 +91,11 @@
                             </template>
                         </el-table-column>
                         <el-table-column prop="description" label="内容" show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column prop="money" label="金额" width="80">
+                            <template slot-scope="scope">
+                                <span>￥{{ scope.row.money }}</span>
+                            </template>
                         </el-table-column>
                         <el-table-column label="状态" width="80">
                             <template slot-scope="scope">
@@ -167,6 +176,10 @@
                     <span>{{ DelegationFrom.location || '未选择' }}</span>
                 </div>
                  <div class="preview-item">
+                    <label>委托金额：</label>
+                    <span>{{ DelegationFrom.money || '0.00' }} 元</span>
+                </div>
+                 <div class="preview-item">
                     <label>委托内容：</label>
                     <p>{{ DelegationFrom.content || '未填写内容' }}</p>
                 </div>
@@ -191,6 +204,9 @@
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="委托金额">
+                     <el-input-number v-model="DraftFrom.money" :precision="2" :step="1" :min="0" placeholder="请输入委托金额"></el-input-number>
                 </el-form-item>
                 <el-form-item label="委托内容">
                     <el-input type="textarea" v-model="DraftFrom.description" :rows="4"
@@ -326,7 +342,8 @@
                 dialogVisiblePublish: false,
                 DelegationFrom: {
                     content: '',
-                    location: ''
+                    location: '',
+                    money: 0.0
                 },
                 publishFrom: {
 
@@ -336,7 +353,8 @@
                     location: "教学楼",
                     description: "教学事故研究会",
                     type: 1,
-                    createdAt: "2024-04-13 09:41:25"
+                    createdAt: "2024-04-13 09:41:25",
+                    money: 0.0
                 },
                 taskType: [],
 

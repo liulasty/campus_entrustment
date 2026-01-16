@@ -172,6 +172,11 @@ export const delDelegateUpdateRecords = (RecordID) => {
     return http.delete('/taskUpdate/' + RecordID)
 }
 
+export const addTaskUpdate = (data) => {
+    console.log("添加任务进度更新");
+    return http.post('/taskUpdate/add', data)
+}
+
 
 export const deleteCertificationRecords = (id) => {
     // console.log("删除认证记录");

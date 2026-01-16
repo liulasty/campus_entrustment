@@ -88,6 +88,9 @@
                     <el-form-item label="委托截止时间" prop="userRole">
                         {{form.task.endTime}}
                     </el-form-item>
+                    <el-form-item label="委托金额" prop="money">
+                        {{form.task.money}} 元
+                    </el-form-item>
                 </el-form-item>
                 <el-form-item label="留言" prop="delegationStr">
                     {{ form.acceptMessage}}
@@ -108,15 +111,32 @@
                 </div>
             </div>
         </el-dialog>
+
+        <!-- 任务进度更新对话框 -->
+        <el-dialog title="更新任务进度" :visible.sync="progressDialogVisible" width="500px" append-to-body>
+            <el-form :model="progressForm" label-width="80px">
+                <el-form-item label="进度描述">
+                    <el-input type="textarea" v-model="progressForm.description" placeholder="请输入任务进度描述，如：已到达目的地..."></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="progressDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitUpdateProgress">提交</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
-    import { getTaskCategories } from '@/api/'
+    import { getTaskCategories, addTaskUpdate } from '@/api/'
     import { acceptDelegationList, queryTheEntrustmentDetailsByEntrustmentNumber, acceptCommission, cancelAcceptorByAcceptor, getTaskAcceptById } from '@/api/user.js'
     import { executeConfirmedRequest } from '@/utils/globalConfirmAction.js'
     export default {
         data() {
             return {
+                progressDialogVisible: false,
+                progressForm: {
+                    description: ''
+                },
                 // 遮罩层
                 loading: true,
                 //委托留言
@@ -199,9 +219,9 @@
                     },
                     "已接收": {
                         index: 4,
-                        title: ["觉得很赞", "觉得很差"],
-                        type: ["success", "warning"],
-                        click: ["increaseGood", "increaseBad"]
+                        title: ["更新进度", "觉得很赞", "觉得很差"],
+                        type: ["primary", "success", "warning"],
+                        click: ["openUpdateProgress", "increaseGood", "increaseBad"]
                     },
 
                 },
@@ -384,6 +404,34 @@
                 executeConfirmedRequest(acceptCommission, data, "确认接受委托", "确认接受委托", "接受委托成功,等待委托发布者处理", "接受委托失败", "接受委托失败", "接受委托取消");
                 this.getList();
                 this.open = false;
+            },
+            openUpdateProgress() {
+                this.progressForm.description = '';
+                this.progressDialogVisible = true;
+            },
+            async submitUpdateProgress() {
+                if (!this.progressForm.description) {
+                    this.$message.error('请输入进度描述');
+                    return;
+                }
+                
+                const data = {
+                    taskId: this.form.task.taskId,
+                    description: this.progressForm.description
+                };
+
+                await executeConfirmedRequest(
+                    addTaskUpdate,
+                    data,
+                    "确认提交任务进度？",
+                    "提示",
+                    "提交",
+                    "提交成功",
+                    "提交失败",
+                    "已取消"
+                );
+                
+                this.progressDialogVisible = false;
             }
         }
 
